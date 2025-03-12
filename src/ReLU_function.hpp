@@ -1,7 +1,7 @@
 #ifndef RELU_FUNCTION_HPP
 #define RELU_FUNCTION_HPP
 
-#include "activation.hpp"
+#include "activation_function.hpp"
 
 class ReLUFunction : public ActivationFunction {
 public:

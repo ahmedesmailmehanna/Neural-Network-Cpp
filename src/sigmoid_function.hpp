@@ -2,7 +2,7 @@
 #define SIGMOID_FUNCTION_HPP
 
 #include <cmath>
-#include "activation.hpp"
+#include "activation_function.hpp"
 
 class SigmoidFunction : public ActivationFunction {
 public:

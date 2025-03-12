@@ -3,6 +3,7 @@
 
 #include "../src/matrix.hpp"  // Include the Matrix class
 
+// Layer's abstract class, you cannot create objects
 class BaseLayer {
 public:
     virtual void forward(Matrix &input) = 0;  // Pure virtual function so it's not called from the derived class
