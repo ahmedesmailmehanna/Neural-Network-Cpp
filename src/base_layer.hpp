@@ -1,14 +1,22 @@
 #ifndef BASE_LAYER_HPP
 #define BASE_LAYER_HPP
 
-#include "../src/matrix.hpp"  // Include the Matrix class
+#include "matrix.hpp"
+#include "serializable.hpp"
 
-// Layer's abstract class, you cannot create objects
-class BaseLayer {
+// Abstract class for all layers
+class BaseLayer : public Serializable {
 public:
-    virtual void forward(Matrix &input) = 0;  // Pure virtual function so it's not called from the derived class
+    Matrix input, output;
+
+    BaseLayer();
+    virtual void forward(Matrix &input) = 0;
     virtual void backward(Matrix &error, double learning_rate) = 0;
-    virtual ~BaseLayer() {}  // Virtual destructor for proper cleanup
+    virtual ~BaseLayer();  // Virtual destructor
+
+    // Default implementation for serialization (to be overridden)
+    virtual void saveToFile(const std::string &filename) override;
+    virtual void loadFromFile(const std::string &filename) override;
 };
 
 #endif  // BASE_LAYER_HPP
