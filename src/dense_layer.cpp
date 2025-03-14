@@ -36,7 +36,12 @@ void DenseLayer::backward(Matrix &error, double learning_rate) {
 // Save weights and biases to file
 void DenseLayer::saveToFile(const std::string &filename) {
     std::ofstream file(filename, std::ios::binary);
-    if (!file) return;  
+    if (!file) {
+        std::cerr << "Error: Could not create file " << filename << std::endl;
+        return;
+    }
+
+    std::cout << "Saving weights and biases to " << filename << std::endl;
 
     for (int i = 0; i < weights.rows; i++) {
         file.write((char*)weights.data[i], weights.cols * sizeof(double));
@@ -46,12 +51,18 @@ void DenseLayer::saveToFile(const std::string &filename) {
     }
 
     file.close();
+    std::cout << "File saved successfully!\n";
 }
 
 // Load weights and biases from file
 void DenseLayer::loadFromFile(const std::string &filename) {
     std::ifstream file(filename, std::ios::binary);
-    if (!file) return;  
+    if (!file) {
+        std::cerr << "Error: Could not open file " << filename << " for loading!" << std::endl;
+        return;
+    }
+
+    std::cout << "Loading weights and biases from " << filename << std::endl;
 
     for (int i = 0; i < weights.rows; i++) {
         file.read((char*)weights.data[i], weights.cols * sizeof(double));
@@ -61,6 +72,7 @@ void DenseLayer::loadFromFile(const std::string &filename) {
     }
 
     file.close();
+    std::cout << "File loaded successfully!\n";
 }
 
 // Destructor: Prevent memory leak by deleting activation function

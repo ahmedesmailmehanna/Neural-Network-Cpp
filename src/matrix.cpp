@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <algorithm>  // For std::copy
 
 // Default constructor: Initializes empty matrix
 Matrix::Matrix() : rows(0), cols(0), data(nullptr) {}
@@ -7,7 +8,15 @@ Matrix::Matrix() : rows(0), cols(0), data(nullptr) {}
 Matrix::Matrix(int r, int c) : rows(r), cols(c) {
     data = new double*[rows];
     for (int i = 0; i < rows; i++) {
+        data[i] = new double[cols](); // () to initialize with zeros 0.0
+    }
+}
+// Copy Constructor: Deep copy
+Matrix::Matrix(const Matrix &other) : rows(other.rows), cols(other.cols) {
+    data = new double*[rows];
+    for (int i = 0; i < rows; i++) {
         data[i] = new double[cols];
+        std::copy(other.data[i], other.data[i] + cols, data[i]);  // Deep iterator copy
     }
 }
 
@@ -79,6 +88,28 @@ Matrix Matrix::operator*(double scalar) const {
     return result;
 }
 
+// Operator Overloading for In-place free before assignment a value
+Matrix& Matrix::operator=(const Matrix &other) {
+    if (this == &other) return *this;  // Self-assignment check
+
+    // Free existing memory
+    for (int i = 0; i < rows; i++) {
+        delete[] data[i];
+    }
+    delete[] data;
+
+    // Copy new data
+    rows = other.rows;
+    cols = other.cols;
+    data = new double*[rows];
+    for (int i = 0; i < rows; i++) {
+        data[i] = new double[cols];
+        std::copy(other.data[i], other.data[i] + cols, data[i]); // Deep copy
+    }
+
+    return *this;
+}
+
 // Transposing the Matrix
 Matrix Matrix::transpose() {
     Matrix transposed(cols, rows);
@@ -103,10 +134,17 @@ Matrix Matrix::applyFunction(std::function<double(double)> func) {
 
 // Print Matrix
 void Matrix::print() {
+    std::cout << "\nMatrix (" << rows << "x" << cols << "):\n";
+    std::cout << "-----------------\n";
+
     for (int i = 0; i < rows; i++) {
+        std::cout << "| ";
         for (int j = 0; j < cols; j++) {
-            std::cout << std::fixed << std::setprecision(3) << data[i][j] << " ";
+            std::cout << std::setw(8) << std::fixed << std::setprecision(3) << data[i][j] << " ";
         }
-        std::cout << std::endl;
+        std::cout << "|\n";
     }
+    
+    std::cout << "-----------------\n";
 }
+

@@ -14,6 +14,7 @@ public:
 
     Matrix();
     Matrix(int r, int c);
+    Matrix(const Matrix &other);
     ~Matrix();
 
     void randomize();
@@ -21,6 +22,7 @@ public:
     Matrix operator-(const Matrix &other);
     Matrix operator*(const Matrix &other);
     Matrix operator*(double scalar) const;
+    Matrix& operator=(const Matrix &other);
     Matrix transpose();
     Matrix applyFunction(std::function<double(double)> func);
     void print();

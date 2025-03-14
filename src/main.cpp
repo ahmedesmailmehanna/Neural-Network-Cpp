@@ -3,17 +3,30 @@
 #include "sigmoid_function.hpp"
 
 int main() {
-    NeuralNetwork<DenseLayer> nn;  // Neural Network with only Dense Layers
+    NeuralNetwork<DenseLayer> nn;
     ActivationFunction* sigmoid = new SigmoidFunction();
 
-    nn.addLayer(new DenseLayer(784, 128, sigmoid));
-    nn.addLayer(new DenseLayer(128, 10, sigmoid));
+    nn.addLayer(new DenseLayer(2, 2, sigmoid));  // Small test network
+    nn.addLayer(new DenseLayer(2, 1, sigmoid));
 
-    Matrix input(1, 784);
-    Matrix target(1, 10);
+    Matrix input(1, 2);
+    Matrix target(1, 1);
 
-    nn.train(input, target, 10, 0.01);
-    nn.saveToFile("model_weights.bin");
+    input.data[0][0] = 0.5;  // Add simple test values
+    input.data[0][1] = -0.2;
+    target.data[0][0] = 1.0;
+
+    std::cout << "Starting training...\n";
+    nn.train(input, target, 100, 0.1);
+
+    std::cout << "Testing forward pass...\n";
+    Matrix result = nn.forward(input);
+    result.print();
+
+    nn.saveToFile("elbees");
+
+
 
     return 0;
 }
+

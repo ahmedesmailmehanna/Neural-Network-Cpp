@@ -19,18 +19,30 @@ public:
         for (auto layer : layers) {
             layer->forward(input);
             input = layer->output;
+
+            std::cout << "Layer Output:";  
+            input.print();  
         }
         return input;
     }
 
     void train(Matrix &input, Matrix &target, int epochs, double learning_rate) override {
+        std::cout << "Training started for " << epochs << " epochs...\n";
+        // std::cout << "hi\n";
         for (int i = 0; i < epochs; i++) {
+            std::cout << "epoch: " << i + 1 << '\n';
             Matrix output = forward(input);
             Matrix error = target - output;
+
+            std::cout << "Error: ";  
+            error.print();  // ✅ Show the error matrix
+
             for (auto it = layers.rbegin(); it != layers.rend(); ++it) {
                 (*it)->backward(error, learning_rate);
             }
         }
+        std::cout << "Training completed!\n";
+
     }
 
     void saveToFile(const std::string &filename) override {
