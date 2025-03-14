@@ -54,7 +54,7 @@ void testSaveAndLoad(const std::string &filename) {
     // Save weights
     layer1.saveToFile(filename);
 
-    // Create another DenseLayer with the same shape but uninitialized
+    // Create another DenseLayer with the same shape 
     DenseLayer layer2(3, 2, sigmoid);
 
     // Load saved weights into the new layer
