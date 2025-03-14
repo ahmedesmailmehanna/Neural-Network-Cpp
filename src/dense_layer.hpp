@@ -19,6 +19,8 @@ public:
     void saveToFile(const std::string &filename) override;
     void loadFromFile(const std::string &filename) override;
 
+    bool isEqual(DenseLayer &other); // For testing
+
     ~DenseLayer();
 };
 

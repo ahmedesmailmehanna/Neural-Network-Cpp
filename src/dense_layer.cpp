@@ -75,6 +75,27 @@ void DenseLayer::loadFromFile(const std::string &filename) {
     std::cout << "File loaded successfully!\n";
 }
 
+// Compares two layers for testing
+bool DenseLayer::isEqual(DenseLayer &other) {
+    for (int i = 0; i < weights.rows; i++) {
+        for (int j = 0; j < weights.cols; j++) {
+            if (weights.data[i][j] != other.weights.data[i][j]) {
+                return false;  // Mismatch found
+            }
+        }
+    }
+
+    for (int i = 0; i < biases.rows; i++) {
+        for (int j = 0; j < biases.cols; j++) {
+            if (biases.data[i][j] != other.biases.data[i][j]) {
+                return false;
+            }
+        }
+    }
+    
+    return true;  // All values match
+}
+
 // Destructor: Prevent memory leak by deleting activation function
 DenseLayer::~DenseLayer() {
     delete activation;
