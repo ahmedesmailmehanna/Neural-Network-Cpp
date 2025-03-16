@@ -3,8 +3,8 @@
 
 class ActivationFunction {
 public:
-    virtual double activate(double x) = 0;        // Pure virtual function
-    virtual double derivative(double x) = 0;      // For backpropagation
+    virtual std::vector<double> activate(const std::vector<double> &x) = 0;        // Pure virtual function
+    virtual std::vector<double> derivative(const std::vector<double> &x) = 0;      // For backpropagation
     virtual ~ActivationFunction() {}              // Virtual destructor
 };
 

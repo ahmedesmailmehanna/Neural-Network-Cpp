@@ -11,10 +11,14 @@ public:
     Matrix weights, biases;
     Matrix input, output;
     ActivationFunction* activation;  // Pointer to activation function
+    bool isOutputLayer; // For softmax
 
     DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc);
+
+
+    
     void forward(Matrix &input) override;
-    void backward(Matrix &error, double learning_rate) override;
+    Matrix backward(Matrix &d_output, double learning_rate) override;
 
     void saveToFile(const std::string &filename) override;
     void loadFromFile(const std::string &filename) override;

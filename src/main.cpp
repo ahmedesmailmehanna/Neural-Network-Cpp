@@ -1,40 +1,68 @@
 #include "neural_network.hpp"
 #include "dense_layer.hpp"
+#include "ReLU_function.hpp"
 #include "sigmoid_function.hpp"
+#include "softmax_function.hpp"
 #include "mnist_loader.hpp"
+#include <vector>
 
 void testSaveAndLoad(const std::string &filename);
-void testLoadMNIST(const std::string &images_file, const std::string &labels_file, int num_images);
+void testLoadMNIST(const std::string &images_file, const std::string &labels_file);
 void testVisualizeMNIST(const std::string &images_file, const std::string &labels_file, int image_index);
 
 int main() {
-    // NeuralNetwork<DenseLayer> nn;
-    // ActivationFunction* sigmoid = new SigmoidFunction();
+    std::string images_file = "../data/train-images-idx3-ubyte";
+    std::string labels_file = "../data/train-labels-idx1-ubyte";
 
-    // nn.addLayer(new DenseLayer(2, 2, sigmoid));  // Small test network
-    // nn.addLayer(new DenseLayer(2, 1, sigmoid));
+    NeuralNetwork<DenseLayer> nn;
+    ActivationFunction* ReLU = new ReLUFunction();
+    ActivationFunction* softmax = new SoftmaxFunction();
+    
+    nn.addLayer(new DenseLayer(784, 10, ReLU));
+    DenseLayer* outputLayer = new DenseLayer(10, 10, softmax);
+    outputLayer->isOutputLayer = true;
+    nn.addLayer(outputLayer);
 
-    // Matrix input(1, 2);
-    // Matrix target(1, 1);
+    std::vector<Matrix> input = loadMNISTImages(images_file);
+    // For flattening the input data (from 28x28 to 1x784) in place
+    for (auto& img : input) {
+        Matrix flattened(1, 784);
+        for (int i = 0; i < 28; i++) {
+            for (int j = 0; j < 28; j++) {
+                flattened.data[0][i * 28 + j] = img.data[i][j];
+            }
+        }
+        img = flattened;  // Replace with flattened version
+    }
 
-    // input.data[0][0] = 0.5;  // Add simple test values
-    // input.data[0][1] = -0.2;
-    // target.data[0][0] = 1.0;
+    
+    std::vector<int> t = loadMNISTLabels(labels_file);
+    std::vector<Matrix> target(t.size());
+    // Converting from int to Matrix(1, 10), with 1 in the correct index
+    for (int i = 0; i < t.size(); i++) {
+        target[i] = Matrix(1, 10);
+        target[i].data[0][t[i]] = 1;
+    } 
+    // input[2].print();
 
-    // std::cout << "Starting training...\n";
-    // nn.train(input, target, 100, 0.1);
+    nn.train(input[1], target[1], 10, 0.001);
 
-    // std::cout << "Testing forward pass...\n";
-    // Matrix result = nn.forward(input);
-    // result.print();
+    // auto inputIt = input.begin();
+    // auto targetIt = target.begin();
 
-    //testSaveAndLoad("testfile");
+    // while (inputIt != input.end() && targetIt != target.end()) {
+    //     nn.train(*inputIt, *targetIt, 100, 0.1);
+    //     ++inputIt;
+    //     ++targetIt;
+    // }
 
-    std::string images_file = "train-images-idx3-ubyte";
-    std::string labels_file = "train-labels-idx1-ubyte";
+    // nn.saveToFile("model_v1");
+    
+    
 
-    testLoadMNIST(images_file, labels_file, 5); // Load a few images for testing 
-    testVisualizeMNIST(images_file, labels_file, 0); // Index of the image to visualize
+    // testSaveAndLoad("testfile");
+    // testLoadMNIST(images_file, labels_file); // Load a few images for testing 
+    // testVisualizeMNIST(images_file, labels_file, 0); // Index of the image to visualize
 
     return 0;
 }
@@ -69,12 +97,12 @@ void testSaveAndLoad(const std::string &filename) {
 }
 
 // Function to test if MNIST data loads correctly
-void testLoadMNIST(const std::string &images_file, const std::string &labels_file, int num_images) {
+void testLoadMNIST(const std::string &images_file, const std::string &labels_file) {
     std::cout << "Running MNIST Data Load Test...\n";
 
     // Load images and labels
-    std::vector<Matrix> images = loadMNISTImages(images_file, num_images);
-    std::vector<int> labels = loadMNISTLabels(labels_file, num_images);
+    std::vector<Matrix> images = loadMNISTImages(images_file);
+    std::vector<int> labels = loadMNISTLabels(labels_file);
 
     // Check if images and labels were loaded successfully
     if (!images.empty() && !labels.empty()) {
@@ -90,8 +118,8 @@ void testVisualizeMNIST(const std::string &images_file, const std::string &label
     std::cout << "\nRunning MNIST Visualization Test...\n";
 
     // Load one image and its label
-    std::vector<Matrix> images = loadMNISTImages(images_file, image_index + 1);
-    std::vector<int> labels = loadMNISTLabels(labels_file, image_index + 1);
+    std::vector<Matrix> images = loadMNISTImages(images_file);
+    std::vector<int> labels = loadMNISTLabels(labels_file);
 
     // Check if data exists
     if (images.empty() || labels.empty()) {

@@ -20,11 +20,13 @@ public:
     void randomize();
     Matrix operator+(const Matrix &other);
     Matrix operator-(const Matrix &other);
+    Matrix elementWiseMultiply(const Matrix &other);
+    Matrix sumRows();
     Matrix operator*(const Matrix &other);
     Matrix operator*(double scalar) const;
     Matrix& operator=(const Matrix &other);
     Matrix transpose();
-    Matrix applyFunction(std::function<double(double)> func);
+    Matrix applyFunction(std::function<std::vector<double>(std::vector<double>&)> func);
     void print();
 };
 

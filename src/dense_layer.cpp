@@ -7,6 +7,7 @@ DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* acti
     : weights(input_size, output_size), biases(1, output_size), activation(activationFunc) {
     weights.randomize();
     biases.randomize();
+    isOutputLayer = false;
 }
 
 // Forward pass: Computes output = (input * weights) + biases
@@ -15,23 +16,41 @@ void DenseLayer::forward(Matrix &input) {
     output = (input * weights) + biases;
     
     // Lambda function to use member function
-    output = output.applyFunction([this](double x) { return activation->activate(x); }); 
+    output = output.applyFunction([this](std::vector<double> x) { return activation->activate(x); }); 
 }
 
 // Backpropagation: Compute weight and bias updates
-void DenseLayer::backward(Matrix &error, double learning_rate) {
-    // Apply activation derivative element-wise (Lambda function)
-    Matrix d_output = error.applyFunction([this](double x) { return activation->derivative(x); });
 
-    // Compute gradients: d_weights = input.T * d_output
-    Matrix d_weights = input.transpose() * d_output;
+Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
+    Matrix delta;
+    
+    if (isOutputLayer) {
+        // For Softmax output layer, we assume d_output = predictions - target
+        delta = d_output;  // No need to multiply by activation derivative
+    } else {
+        // Compute derivative of activation
+        Matrix d_activation = output.applyFunction([this](std::vector<double> x) { return activation->derivative(x); });
 
-    // Update weights: weights = weights - (d_weights * learning_rate)
+        // Compute delta (error signal)
+        delta = d_output.elementWiseMultiply(d_activation);
+    }
+
+    // Compute gradients
+    Matrix d_weights = input.transpose() * delta;
+    Matrix d_biases = delta.sumRows();  // Sum across batch
+    
+    // std::cout << "biases: " << biases.rows << "x" << biases.cols << std::endl;
+    // std::cout << "d_biases: " << d_biases.rows << "x" << d_biases.cols << std::endl;
+
+    // Update parameters
     weights = weights - (d_weights * learning_rate);
+    biases = biases - (d_biases * learning_rate);
 
-    // Update biases: biases = biases - (d_output * learning_rate)
-    biases = biases - (d_output * learning_rate);
+    // Propagate error to the previous layer
+    Matrix d_input = delta * weights.transpose();
+    return d_input;
 }
+
 
 // Save weights and biases to file
 void DenseLayer::saveToFile(const std::string &filename) {

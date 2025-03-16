@@ -11,7 +11,7 @@ public:
 
     BaseLayer(); // Definition for default contructor so linker doesn't get confused
     virtual void forward(Matrix &input) = 0;
-    virtual void backward(Matrix &error, double learning_rate) = 0;
+    virtual Matrix backward(Matrix &d_output, double learning_rate) = 0;
     virtual ~BaseLayer();  // Virtual destructor with definition for linker
 };
 

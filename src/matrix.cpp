@@ -43,6 +43,9 @@ void Matrix::randomize() {
 
 // Operator Overloading for Matrix Addition
 Matrix Matrix::operator+(const Matrix &other) {
+    if (rows != other.rows || cols != other.cols) {
+        throw std::invalid_argument("Matrix dimensions do not match for Addition");
+    }
     Matrix result(rows, cols);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -54,6 +57,9 @@ Matrix Matrix::operator+(const Matrix &other) {
 
 // Operator Overloading for Matrix Subtraction
 Matrix Matrix::operator-(const Matrix &other) {
+    if (rows != other.rows || cols != other.cols) {
+        throw std::invalid_argument("Matrix dimensions do not match for Subtraction");
+    }
     Matrix result(rows, cols);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -63,14 +69,43 @@ Matrix Matrix::operator-(const Matrix &other) {
     return result;
 }
 
+Matrix Matrix::elementWiseMultiply(const Matrix &other) {
+    if (rows != other.rows || cols != other.cols) {
+        throw std::invalid_argument("Matrix dimensions do not match for Element wise multiply");
+    }
+    Matrix result(rows, cols);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result.data[i][j] = data[i][j] * other.data[i][j];
+        }
+    }
+    return result;
+}
+
+Matrix Matrix::sumRows() {
+    Matrix result(1, cols); // Result should be (1, cols)
+    for (int j = 0; j < cols; j++) { // Iterate over columns
+        double sum = 0;
+        for (int i = 0; i < rows; i++) { // Sum over rows
+            sum += data[i][j];
+        }
+        result.data[0][j] = sum; // Store in the first row
+    }
+    return result;
+}
+
+
 // Operator Overloading for Matrix Multiplication
 Matrix Matrix::operator*(const Matrix &other) {
+    if (cols != other.rows) {
+        throw std::invalid_argument("Matrix dimensions do not match for multiplication");
+    }
     Matrix result(rows, other.cols);
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < other.cols; j++) {
             result.data[i][j] = 0;
             for (int k = 0; k < cols; k++) {
-                result.data[i][j] += data[i][k] * other.data[k][j];
+                result.data[i][j] = result.data[i][j] + (data[i][k] * other.data[k][j]);
             }
         }
     }
@@ -121,12 +156,17 @@ Matrix Matrix::transpose() {
     return transposed;
 }
 
-// Apply Function (Activation)
-Matrix Matrix::applyFunction(std::function<double(double)> func) {
+// Apply Function (Activation) row wise
+Matrix Matrix::applyFunction(std::function<std::vector<double>(std::vector<double>&)> func) {
     Matrix result(rows, cols);
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            result.data[i][j] = func(data[i][j]);  // Apply function to each element
+    std::vector<double> d(cols);
+    for (int i = 0; i < rows; i++) { // for each row
+        for (int j = 0; j < cols; j++) { // iterate the row
+            d[j] = data[i][j]; // get the data
+        }
+        std::vector<double> rd = func(d); // apply the function to the row
+        for (int j = 0; j < cols; j++) { // iterate the cols of the result
+            result.data[i][j] = rd[j]; // fill the result
         }
     }
     return result;

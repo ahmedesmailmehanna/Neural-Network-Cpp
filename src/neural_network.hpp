@@ -18,6 +18,7 @@ public:
     Matrix forward(Matrix input) {
         for (auto layer : layers) {
             layer->forward(input);
+            std::cout << "hi\n";
             input = layer->output;
 
             std::cout << "Layer Output:";  
@@ -28,22 +29,27 @@ public:
 
     void train(Matrix &input, Matrix &target, int epochs, double learning_rate) override {
         std::cout << "Training started for " << epochs << " epochs...\n";
-        // std::cout << "hi\n";
+        
         for (int i = 0; i < epochs; i++) {
-            std::cout << "epoch: " << i + 1 << '\n';
+            std::cout << "Epoch: " << i + 1 << '\n';
+            
+            // Forward pass
             Matrix output = forward(input);
-            Matrix error = target - output;
-
+            Matrix error = target - output;  // Loss gradient for output layer
+            
             std::cout << "Error: ";  
-            error.print();  // ✅ Show the error matrix
-
+            error.print();  // Show the error matrix
+            
+            // Backward pass (iterate from last to first layer)
+            Matrix d_input = error;  // Start with error at output layer
             for (auto it = layers.rbegin(); it != layers.rend(); ++it) {
-                (*it)->backward(error, learning_rate);
+                d_input = (*it)->backward(d_input, learning_rate);  // Pass the new gradient
             }
         }
+    
         std::cout << "Training completed!\n";
-
     }
+    
 
     void saveToFile(const std::string &filename) override {
         for (auto layer : layers) {

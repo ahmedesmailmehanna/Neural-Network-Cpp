@@ -5,12 +5,20 @@
 
 class ReLUFunction : public ActivationFunction {
 public:
-    double activate(double x) override {
-        return (x > 0) ? x : 0;
+    std::vector<double> activate(const std::vector<double> &x) {
+        std::vector<double> y(x.size());
+        for (int i = 0; i < x.size(); i++) {
+            y[i] = (x[i] > 0) ? x[i] : 0;
+        }
+        return y;
     }
 
-    double derivative(double x) override {
-        return (x > 0) ? 1 : 0;
+    std::vector<double> derivative(const std::vector<double> &x) {
+        std::vector<double> y(x.size());
+        for (int i = 0; i < x.size(); i++) {
+            y[i] = (x[i] > 0) ? 1 : 0;
+        }
+        return y;
     }
 };
 

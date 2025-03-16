@@ -4,7 +4,7 @@
 #include <vector>
 
 // Function to read MNIST images from the binary file
-std::vector<Matrix> loadMNISTImages(const std::string &filename, int num_images) {
+std::vector<Matrix> loadMNISTImages(const std::string &filename) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
@@ -13,7 +13,16 @@ std::vector<Matrix> loadMNISTImages(const std::string &filename, int num_images)
     }
 
     // MNIST file headers contain metadata that describes the dataset
-    int magic_number = 0, num_rows = 0, num_cols = 0;
+    int magic_number = 0, num_images = 0, num_rows = 0, num_cols = 0;
+
+    // char magicNumber[4];  // loading data
+    // char numOfImages[4];
+    // char numOfRows[4];
+    // char numOfCols[4];
+    // file.read(magicNumber, 4);
+    // file.read(numOfImages, 4);
+    // file.read(numOfRows, 4);
+    // file.read(numOfCols, 4);
     
     // Read first 16 bytes (metadata)
     file.read((char*)&magic_number, sizeof(magic_number));  // Magic number (4 bytes) 0-3
@@ -28,7 +37,7 @@ std::vector<Matrix> loadMNISTImages(const std::string &filename, int num_images)
     num_rows = __builtin_bswap32(num_rows);
     num_cols = __builtin_bswap32(num_cols);
 
-    // Debugging Output (Optional)
+    // Debugging Output
     std::cout << "Loading MNIST Images...\n";
     std::cout << "Magic Number: " << magic_number << "\n";
     std::cout << "Number of Images: " << num_images << "\n";
@@ -61,7 +70,7 @@ std::vector<Matrix> loadMNISTImages(const std::string &filename, int num_images)
 }
 
 // Function to read MNIST labels from the binary file
-std::vector<int> loadMNISTLabels(const std::string &filename, int num_labels) {
+std::vector<int> loadMNISTLabels(const std::string &filename) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
