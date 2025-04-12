@@ -30,3 +30,4 @@ $(TEST_TARGET): $(filter-out $(OBJ_DIR)/main.o,$(OBJS))
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+

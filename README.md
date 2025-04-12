@@ -2,6 +2,8 @@
 
 A lightweight neural network library implemented in modern C++ with dense layers and MNIST support.
 
+Still in development.
+
 ## Features
 
 - 🧠 Dense (fully-connected) layers
