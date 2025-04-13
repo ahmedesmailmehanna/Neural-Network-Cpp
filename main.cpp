@@ -1,9 +1,9 @@
-#include "neural_network.hpp"
-#include "./layers/dense_layer.hpp"
-#include "./activations/ReLU_function.hpp"
-#include "sigmoid_function.hpp"
-#include "softmax_function.hpp"
-#include "mnist_loader.hpp"
+#include "./src/core/neural_network.hpp"
+#include "./src/layers/dense_layer.hpp"
+#include "./src/activations/ReLU_function.hpp"
+#include "./src/activations/sigmoid_function.hpp"
+#include "./src/activations/softmax_function.hpp"
+#include "./src/utils/mnist_loader.hpp"
 #include <vector>
 #include <chrono> // To Measure time
 #include <string>
@@ -17,8 +17,8 @@ Matrix createTargetMatrix(double label);
 
 int main() {
     std::stack<std::string> s;
-    std::string images_file = "data/train-images-idx3-ubyte";
-    std::string labels_file = "data/train-labels-idx1-ubyte";
+    std::string images_file = "./src/data/train-images-idx3-ubyte";
+    std::string labels_file = "./src/data/train-labels-idx1-ubyte";
 
     NeuralNetwork<DenseLayer> nn;
     ActivationFunction* sigmoid = new SigmoidFunction();
@@ -51,7 +51,7 @@ int main() {
 
     
     // Data training
-    // nn.loadFromFile("model_v2.1");
+    // nn.loadFromFile("./src/models/model_v2.1");
 
     // auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -64,22 +64,26 @@ int main() {
     // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
     // std::cout << "Training completed in " << duration << " minutes.\n";
 
-    // nn.saveToFile("model_v2.1");
+    // nn.saveToFile("./src/models/model_v2.1");
 
     // ==================================================
 
-    nn.loadFromFile("model_v2.1");
+    nn.loadFromFile("./src/models/model_v2.1");
+    // nn.loadFromFile("test");
 
     int n = 99;
 
-    nn.train(input[n], target[n], 12, 0.01);
+    for (int i = 0; i < 3; i++) {
+        nn.train(input[n + i], target[n + i], 10, 0.01);
+    }
 
     Matrix out = nn.forward(input[n]);
 
     out.print();
     target[n].print();
 
-    nn.saveToFile("model_v2.1");
+    nn.saveToFile("./src/models/model_v2.1");
+    // nn.saveToFile("test");
 
     // ===================================================
     
@@ -135,6 +139,6 @@ void testLoadMNIST(const std::string &images_file, const std::string &labels_fil
     }
 }
 
-Matrix createMNISTTargetMatrix(double label) {
+// Matrix createMNISTTargetMatrix(double label) {
 
-}
+// }
