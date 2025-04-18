@@ -137,19 +137,20 @@ bool testDenseLayerForward() {
 // Neural Network Tests
 bool testNeuralNetworkForward() {
     NeuralNetwork<DenseLayer> nn;
-    ActivationFunction* sigmoid = new SigmoidFunction();
     
-    nn.addLayer(new DenseLayer(2, 2, sigmoid));
-    nn.addLayer(new DenseLayer(2, 1, sigmoid));
+    nn.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
+    nn.addLayer(new DenseLayer(2, 1, new activations::Softmax(), true)); // Output layer
     
     Matrix input(1, 2);
     input.data[0][0] = 1.0; input.data[0][1] = 1.0;
-    
 
     Matrix output = nn.forward(input);
-        
-    delete sigmoid;
     
+    // The output should be a 1x1 matrix since the last layer has 1 neuron
+    // Check if the output is a 1x1 matrix and the value is between 0 and 1 (softmax output)
+    if (output.data[0][0] < 0 || output.data[0][0] > 1) {
+        return false;
+    }
     return output.rows == 1 && output.cols == 1;
 }
 
@@ -204,15 +205,17 @@ int main() {
     runner.runTest("Matrix Random Initialization", testMatrixRandomInitialization);
 
 
-    // std::cout << "\nRunning Layer Tests..." << std::endl;
-    // runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
+    std::cout << "\nRunning Layer Tests..." << std::endl;
+    runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
 
-    // std::cout << "\nRunning Neural Network Tests..." << std::endl;
-    // runner.runTest("Neural Network Forward Pass", testNeuralNetworkForward);
+
+    std::cout << "\nRunning Neural Network Tests..." << std::endl;
+    runner.runTest("Neural Network Forward Pass", testNeuralNetworkForward);
 
 
     std::cout << "\nRunning Data Loading Tests..." << std::endl;
     runner.runTest("MNIST Data Loading", testMNISTDataLoading);
+
 
     std::cout << "\nRunning Model Save/Load Tests..." << std::endl;
     runner.runTest("Model Save and Load", testModelSaveLoad);
