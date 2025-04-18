@@ -1,7 +1,8 @@
 # Neural Network Framework in C++
 
 A modular and extensible neural network framework implemented in modern C++ for building and training neural networks. This framework is designed to be lightweight, flexible, and easily integrated into other projects.
-Still in development.
+
+This framework is designed with a **test-driven approach**, ensuring reliability and correctness through comprehensive testing of its components.
 
 ## Table of Contents
 
