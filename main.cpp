@@ -11,7 +11,6 @@
 void testSaveAndLoad(const std::string &filename);
 void testLoadMNIST(const std::string &images_file, const std::string &labels_file);
 void testVisualizeMNIST(const std::string &images_file, const std::string &labels_file, int image_index);
-Matrix createTargetMatrix(double label);
 
 int main() {
     std::string images_file = "./data/train-images-idx3-ubyte";
@@ -31,25 +30,27 @@ int main() {
         img = utils::flatten(img);  // Replace with flattened version
     }
     
-    std::vector<int> t = utils::loadMNISTLabels(labels_file);
-    std::vector<Matrix> target(t.size());
+    std::vector<int> labels = utils::loadMNISTLabels(labels_file);
+    std::vector<Matrix> target(labels.size());
     // Converting from int to Matrix(1, 10), with 1 in the correct index
-    for (int i = 0; i < t.size(); i++) {
-        target[i] = utils::createMNISTTargetMatrix(t[i]);
+    for (int i = 0; i < labels.size(); i++) {
+        target[i] = utils::createMNISTTargetMatrix(labels[i]);
     } 
 
     
     // Data training
+
     nn.loadFromFile("./src/models/model_v2.1");
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < input.size(); i++) {
+    for (int i = 0; i < 5000; i++) {
         std::cout << "Trianing number: " << i << std::endl;
         nn.train(input[i], target[i], 300, 0.01);
     }
     
     auto end_time = std::chrono::high_resolution_clock::now();
+
     double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
     std::cout << "Training completed in " << duration << " minutes.\n";
 
@@ -60,7 +61,6 @@ int main() {
     nn.loadFromFile("./src/models/model_v2.1");
 
     int n = 99;
-
     for (int i = 0; i < 3; i++) {
         nn.train(input[n + i], target[n + i], 10, 0.01);
     }
@@ -74,40 +74,19 @@ int main() {
 
     // ===================================================
     
-
-    // testSaveAndLoad("testfile");
-    // testLoadMNIST(images_file, labels_file); // Load a few images for testing 
     return 0;
 }
 
 // Function to test if data saves/loads correctly
-void testSaveAndLoad(const std::string &filename) {
-    std::cout << "Running Save & Load Test...\n";
-
-    // Create and initialize a DenseLayer
-    ActivationFunction* sigmoid = new SigmoidFunction();
-    DenseLayer layer1(3, 2, sigmoid);
+bool testSaveAndLoad() {
+    DenseLayer layer1(3, 2, new activations::Sigmoid());
+    layer1.saveToFile("filename");
+    DenseLayer layer2(3, 2, new activations::Sigmoid());
+    layer2.loadFromFile("filename");
     
-    std::cout << "Initial Weights & Biases (Before Saving):\n";
-    layer1.weights.print();
-    layer1.biases.print();
-
-    // Save weights
-    layer1.saveToFile(filename);
-
-    // Create another DenseLayer with the same shape 
-    DenseLayer layer2(3, 2, sigmoid);
-
-    // Load saved weights into the new layer
-    layer2.loadFromFile(filename);
-
-    // ✅ Verify that loaded weights match saved weights
-    if (layer1.isEqual(layer2)) {
-        std::cout << "Test Passed: Weights & Biases match after loading!\n";
-    } else {
-        std::cout << "Test Failed: Weights & Biases do NOT match after loading!\n";
-    }
+    return layer1.isEqual(layer2);
 }
+    
 
 // Function to test if MNIST data loads correctly
 void testLoadMNIST(const std::string &images_file, const std::string &labels_file) {
@@ -125,7 +104,3 @@ void testLoadMNIST(const std::string &images_file, const std::string &labels_fil
         std::cout << "Error: MNIST data loading failed.\n";
     }
 }
-
-// Matrix createMNISTTargetMatrix(int label) {
-
-// }

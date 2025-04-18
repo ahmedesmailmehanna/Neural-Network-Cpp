@@ -51,14 +51,16 @@ public:
     
 
     void saveToFile(const std::string &filename) override {
-        for (auto layer : layers) {
-            layer->saveToFile(filename);
+        for (size_t i = 0; i < layers.size(); i++) {
+            std::string layerFilename = filename + "_layer_" + std::to_string(i) + ".dat";
+            layers[i]->saveToFile(layerFilename);
         }
     }
 
     void loadFromFile(const std::string &filename) override {
-        for (auto layer : layers) {
-            layer->loadFromFile(filename);
+        for (size_t i = 0; i < layers.size(); i++) {
+            std::string layerFilename = filename + "_layer_" + std::to_string(i) + ".dat";
+            layers[i]->loadFromFile(layerFilename);
         }
     }
 

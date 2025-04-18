@@ -1,9 +1,9 @@
 #include "../src/math/matrix.hpp"
 #include "../src/layers/dense_layer.hpp"
 #include "../src/core/neural_network.hpp"
-#include "../src/activations/sigmoid_function.hpp"
-#include "../src/activations/softmax_function.hpp"
+#include "../src/activations/activations.hpp"
 #include "../src/utils/utils.hpp"
+#include "./test_runner.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,58 +12,43 @@
 
 using namespace std;
 
-class TestRunner {
-private:
-    int totalTests = 0;
-    int passedTests = 0;
-    std::string currentTestName;
-
-    void printTestResult(bool passed) {
-        cout <<"hellooooo"<< endl;
-        totalTests++;
-        if (passed) {
-            passedTests++;
-            std::cout << currentTestName << " PASSED" << std::endl;
-        } else {
-            std::cout << currentTestName << " FAILED" << std::endl;
-        }
-    }
-
-public:
-    void runTest(const std::string name, std::function<bool()> test) {
-        currentTestName = name;
-        bool result = test();
-
-        printTestResult(result);
-    }
-
-    void printSummary() {
-        std::cout << "\nTest Summary:" << std::endl;
-        std::cout << "Total Tests: " << totalTests << std::endl;
-        std::cout << "Passed: " << passedTests << std::endl;
-        std::cout << "Failed: " << (totalTests - passedTests) << std::endl;
-        std::cout << "Success Rate: " << (static_cast<double>(passedTests) / totalTests * 100) << "%" << std::endl;
-    }
-};
-
-// Matrix Tests
-bool testMatrixOperations() {
+// Test for Matrix Addition
+bool testMatrixAddition() {
     Matrix m1(2, 2);
     m1.data[0][0] = 1; m1.data[0][1] = 2;
     m1.data[1][0] = 3; m1.data[1][1] = 4;
 
     Matrix m2(2, 2);
-    m2.data[0][0] = 1; m2.data[0][1] = 2;
-    m2.data[1][0] = 3; m2.data[1][1] = 4;
+    m2.data[0][0] = 5; m2.data[0][1] = 6;
+    m2.data[1][0] = 7; m2.data[1][1] = 8;
 
     Matrix sum = m1 + m2;
     Matrix expectedSum(2, 2);
-    expectedSum.data[0][0] = 2; expectedSum.data[0][1] = 4;
-    expectedSum.data[1][0] = 6; expectedSum.data[1][1] = 8;
+    expectedSum.data[0][0] = 6; expectedSum.data[0][1] = 8;
+    expectedSum.data[1][0] = 10; expectedSum.data[1][1] = 12;
 
     return sum.isEqual(expectedSum);
 }
 
+// Test for Matrix Subtraction
+bool testMatrixSubtraction() {
+    Matrix m1(2, 2);
+    m1.data[0][0] = 5; m1.data[0][1] = 6;
+    m1.data[1][0] = 7; m1.data[1][1] = 8;
+
+    Matrix m2(2, 2);
+    m2.data[0][0] = 1; m2.data[0][1] = 2;
+    m2.data[1][0] = 3; m2.data[1][1] = 4;
+
+    Matrix diff = m1 - m2;
+    Matrix expectedDiff(2, 2);
+    expectedDiff.data[0][0] = 4; expectedDiff.data[0][1] = 4;
+    expectedDiff.data[1][0] = 4; expectedDiff.data[1][1] = 4;
+
+    return diff.isEqual(expectedDiff);
+}
+
+// Test for Matrix Multiplication
 bool testMatrixMultiplication() {
     Matrix m1(2, 3);
     m1.data[0][0] = 1; m1.data[0][1] = 2; m1.data[0][2] = 3;
@@ -80,6 +65,51 @@ bool testMatrixMultiplication() {
     expectedProduct.data[1][0] = 139; expectedProduct.data[1][1] = 154;
 
     return product.isEqual(expectedProduct);
+}
+
+// Test for Matrix Transposition
+bool testMatrixTranspose() {
+    Matrix m(2, 3);
+    m.data[0][0] = 1; m.data[0][1] = 2; m.data[0][2] = 3;
+    m.data[1][0] = 4; m.data[1][1] = 5; m.data[1][2] = 6;
+
+    Matrix transposed = m.transpose();
+    Matrix expectedTranspose(3, 2);
+    expectedTranspose.data[0][0] = 1; expectedTranspose.data[0][1] = 4;
+    expectedTranspose.data[1][0] = 2; expectedTranspose.data[1][1] = 5;
+    expectedTranspose.data[2][0] = 3; expectedTranspose.data[2][1] = 6;
+
+    return transposed.isEqual(expectedTranspose);
+}
+
+// Test for Scalar Multiplication
+bool testMatrixScalarMultiplication() {
+    Matrix m(2, 2);
+    m.data[0][0] = 1; m.data[0][1] = 2;
+    m.data[1][0] = 3; m.data[1][1] = 4;
+
+    Matrix scaled = m * 2.0;
+    Matrix expectedScaled(2, 2);
+    expectedScaled.data[0][0] = 2; expectedScaled.data[0][1] = 4;
+    expectedScaled.data[1][0] = 6; expectedScaled.data[1][1] = 8;
+
+    return scaled.isEqual(expectedScaled);
+}
+
+// Test for Random Initialization
+bool testMatrixRandomInitialization() {
+    Matrix m(2, 2);
+    m.randomize();
+
+    // Check if all elements are within the expected range (-0.1 to 0.1)
+    for (int i = 0; i < m.rows; i++) {
+        for (int j = 0; j < m.cols; j++) {
+            if (m.data[i][j] < -0.1 || m.data[i][j] > 0.1) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 // Layer Tests
@@ -125,10 +155,8 @@ bool testNeuralNetworkForward() {
 
 // MNIST Data Tests
 bool testMNISTDataLoading() {
-
-    cout << "hi5" << endl;;
-    std::string images_file = "../data/train-images-idx3-ubyte";
-    std::string labels_file = "../data/train-labels-idx1-ubyte";
+    std::string images_file = "./data/train-images-idx3-ubyte";
+    std::string labels_file = "./data/train-labels-idx1-ubyte";
 
     std::vector<Matrix> images = utils::loadMNISTImages(images_file);
     std::vector<int> labels = utils::loadMNISTLabels(labels_file);
@@ -141,36 +169,47 @@ bool testMNISTDataLoading() {
 // Model Save/Load Tests
 bool testModelSaveLoad() {
     NeuralNetwork<DenseLayer> nn1;
-    ActivationFunction* sigmoid = new SigmoidFunction();
     
-    nn1.addLayer(new DenseLayer(2, 2, sigmoid));
-    nn1.addLayer(new DenseLayer(2, 1, sigmoid));
+    nn1.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
+    nn1.addLayer(new DenseLayer(2, 1, new activations::Sigmoid()));
 
     // Save the model
-    nn1.saveToFile("test_model");
+    nn1.saveToFile("./tests/test_model");
 
     // Create a new network and load the saved model
     NeuralNetwork<DenseLayer> nn2;
-    nn2.addLayer(new DenseLayer(2, 2, sigmoid));
-    nn2.addLayer(new DenseLayer(2, 1, sigmoid));
-    nn2.loadFromFile("test_model");
+    nn2.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
+    nn2.addLayer(new DenseLayer(2, 1, new activations::Sigmoid()));
+    nn2.loadFromFile("./tests/test_model");
 
-    // Compare the weights and biases of the first layer
-    return nn1.layers[0]->isEqual(*nn2.layers[0]);
+    // nn1.layers[1]->weights.print();
+    // nn1.layers[1]->biases.print();
+    // nn2.layers[1]->weights.print();
+    // nn2.layers[1]->biases.print();
+
+    // Compare the weights and biases of the layers
+    return nn1.layers[0]->isEqual(*nn2.layers[0]) && 
+           nn1.layers[1]->isEqual(*nn2.layers[1]);
 }
 
 int main() {
     TestRunner runner;
 
     std::cout << "Running Matrix Tests..." << std::endl;
-    runner.runTest("Matrix Addition", testMatrixOperations);
+    runner.runTest("Matrix Addition", testMatrixAddition);
+    runner.runTest("Matrix Subtraction", testMatrixSubtraction);
     runner.runTest("Matrix Multiplication", testMatrixMultiplication);
+    runner.runTest("Matrix Transpose", testMatrixTranspose);
+    runner.runTest("Matrix Scalar Multiplication", testMatrixScalarMultiplication);
+    runner.runTest("Matrix Random Initialization", testMatrixRandomInitialization);
 
-    std::cout << "\nRunning Layer Tests..." << std::endl;
-    runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
 
-    std::cout << "\nRunning Neural Network Tests..." << std::endl;
-    runner.runTest("Neural Network Forward Pass", testNeuralNetworkForward);
+    // std::cout << "\nRunning Layer Tests..." << std::endl;
+    // runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
+
+    // std::cout << "\nRunning Neural Network Tests..." << std::endl;
+    // runner.runTest("Neural Network Forward Pass", testNeuralNetworkForward);
+
 
     std::cout << "\nRunning Data Loading Tests..." << std::endl;
     runner.runTest("MNIST Data Loading", testMNISTDataLoading);

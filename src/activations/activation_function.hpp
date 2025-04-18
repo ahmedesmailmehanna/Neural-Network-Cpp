@@ -11,3 +11,7 @@ public:
 };
 
 #endif // ACTIVATION_FUNCTION_HPP
+
+// can't make them virtual and static at the same time.
+// in other words, can't make derived classes static and we need to pass a new instance each time
+// to the layer.
