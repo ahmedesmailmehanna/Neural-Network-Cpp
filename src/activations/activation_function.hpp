@@ -5,9 +5,9 @@
 
 class ActivationFunction {
 public:
-    virtual std::vector<double> activate(const std::vector<double> &x) = 0;        // Pure virtual function
-    virtual std::vector<double> derivative(const std::vector<double> &x) = 0;      // For backpropagation
-    virtual ~ActivationFunction() {}              // Virtual destructor
+    virtual std::vector<double> activate(const std::vector<double> &x) = 0;
+    virtual std::vector<double> derivative(const std::vector<double> &x) = 0;
+    virtual ~ActivationFunction() {}
 };
 
 #endif // ACTIVATION_FUNCTION_HPP

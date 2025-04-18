@@ -20,8 +20,7 @@ Still in development.
 ### Compilation
 ```bash
 # Compile all source files directly
-g++ -std=c++17 -O3 -o neuralnet \
-    src/matrix.cpp \
-    src/dense_layer.cpp \
-    src/mnist_loader.cpp \
-    src/main.cpp
+g++ g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/base_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+
+## Getting Started
+

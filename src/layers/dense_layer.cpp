@@ -1,4 +1,5 @@
 #include "dense_layer.hpp"
+#include "../activations/softmax_function.hpp" // for last layer logic
 #include <fstream>
 
 // Weights Matrix has input_size rows and output_size cols
@@ -19,8 +20,13 @@ DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* acti
 void DenseLayer::forward(Matrix &input) {
     this->input = input;
     output = (input * weights) + biases;
+
+    // Check if the activation function is Softmax and enforce output layer usage
+    if (typeid(*activation) == typeid(SoftmaxFunction) && !isOutputLayer) {
+        throw std::logic_error("SoftmaxFunction can only be used in the output layer: new DenseLayer(..., true)");
+    }
     
-    // Lambda function to use member function
+    // Lambda function to use member activation function
     output = output.applyFunction([this](std::vector<double> x) { return activation->activate(x); }); 
 }
 

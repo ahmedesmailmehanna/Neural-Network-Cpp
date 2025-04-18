@@ -30,7 +30,10 @@ public:
 
     // Compute the derivative of the Softmax function
     std::vector<double> derivative(const std::vector<double>& input) {
-        std::cout << "tried to call softmax derivative" << std::endl;
+        // here we would typically compute the Jacobian matrix of the Softmax function
+        
+        // raise error use softmax functions only on output layer
+        std::cerr << "Softmax derivative is not implemented. Softmax is typically used as an output layer activation function." << std::endl;
     }
 };
 

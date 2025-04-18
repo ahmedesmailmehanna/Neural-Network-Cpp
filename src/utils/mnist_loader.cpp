@@ -1,10 +1,10 @@
-#include "mnist_loader.hpp"
+#include "utils.hpp"
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 // Function to read MNIST images from the binary file
-std::vector<Matrix> loadMNISTImages(const std::string &filename) {
+std::vector<Matrix> utils::loadMNISTImages(const std::string &filename) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
@@ -70,7 +70,7 @@ std::vector<Matrix> loadMNISTImages(const std::string &filename) {
 }
 
 // Function to read MNIST labels from the binary file
-std::vector<int> loadMNISTLabels(const std::string &filename) {
+std::vector<int> utils::loadMNISTLabels(const std::string &filename) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file) {

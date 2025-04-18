@@ -18,6 +18,7 @@ public:
     ~Matrix();
 
     void randomize();
+    bool isEqual(const Matrix& other) const;
     Matrix operator+(const Matrix &other) const;
     Matrix operator-(const Matrix &other) const;
     Matrix elementWiseMultiply(const Matrix &other) const;

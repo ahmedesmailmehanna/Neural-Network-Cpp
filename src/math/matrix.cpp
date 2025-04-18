@@ -41,6 +41,20 @@ void Matrix::randomize() {
     }
 }
 
+// Check Equality of two matrices
+bool Matrix::isEqual(const Matrix& other) const {
+    if (this->rows != other.rows || this->cols != other.cols)
+        return false;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (this->data[i][j] != other.data[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+
 // Operator Overloading for Matrix Addition
 Matrix Matrix::operator+(const Matrix &other) const {
     if (rows != other.rows || cols != other.cols) {

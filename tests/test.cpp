@@ -1,14 +1,16 @@
-#include "matrix.hpp"
-#include "dense_layer.hpp"
-#include "neural_network.hpp"
-#include "sigmoid_function.hpp"
-#include "softmax_function.hpp"
-#include "mnist_loader.hpp"
+#include "../src/math/matrix.hpp"
+#include "../src/layers/dense_layer.hpp"
+#include "../src/core/neural_network.hpp"
+#include "../src/activations/sigmoid_function.hpp"
+#include "../src/activations/softmax_function.hpp"
+#include "../src/utils/utils.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <functional>
 #include <chrono>
+
+using namespace std;
 
 class TestRunner {
 private:
@@ -17,19 +19,21 @@ private:
     std::string currentTestName;
 
     void printTestResult(bool passed) {
+        cout <<"hellooooo"<< endl;
         totalTests++;
         if (passed) {
             passedTests++;
-            std::cout << "✅ " << currentTestName << " PASSED" << std::endl;
+            std::cout << currentTestName << " PASSED" << std::endl;
         } else {
-            std::cout << "❌ " << currentTestName << " FAILED" << std::endl;
+            std::cout << currentTestName << " FAILED" << std::endl;
         }
     }
 
 public:
-    void runTest(const std::string& name, std::function<bool()> test) {
+    void runTest(const std::string name, std::function<bool()> test) {
         currentTestName = name;
         bool result = test();
+
         printTestResult(result);
     }
 
@@ -107,23 +111,27 @@ bool testNeuralNetworkForward() {
     
     nn.addLayer(new DenseLayer(2, 2, sigmoid));
     nn.addLayer(new DenseLayer(2, 1, sigmoid));
-
+    
     Matrix input(1, 2);
     input.data[0][0] = 1.0; input.data[0][1] = 1.0;
+    
 
     Matrix output = nn.forward(input);
+        
+    delete sigmoid;
     
-    // Just check if the output has the correct shape
     return output.rows == 1 && output.cols == 1;
 }
 
 // MNIST Data Tests
 bool testMNISTDataLoading() {
+
+    cout << "hi5" << endl;;
     std::string images_file = "../data/train-images-idx3-ubyte";
     std::string labels_file = "../data/train-labels-idx1-ubyte";
 
-    std::vector<Matrix> images = loadMNISTImages(images_file);
-    std::vector<int> labels = loadMNISTLabels(labels_file);
+    std::vector<Matrix> images = utils::loadMNISTImages(images_file);
+    std::vector<int> labels = utils::loadMNISTLabels(labels_file);
 
     return !images.empty() && !labels.empty() && 
            images.size() == labels.size() &&

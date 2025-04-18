@@ -1,9 +1,7 @@
 #include "./src/core/neural_network.hpp"
 #include "./src/layers/dense_layer.hpp"
-#include "./src/activations/ReLU_function.hpp"
-#include "./src/activations/sigmoid_function.hpp"
-#include "./src/activations/softmax_function.hpp"
-#include "./src/utils/mnist_loader.hpp"
+#include "./src/activations/activations.hpp"
+#include "./src/utils/utils.hpp"
 #include <vector>
 #include <chrono> // To Measure time
 #include <string>
@@ -16,60 +14,50 @@ void testVisualizeMNIST(const std::string &images_file, const std::string &label
 Matrix createTargetMatrix(double label);
 
 int main() {
-    std::stack<std::string> s;
-    std::string images_file = "./src/data/train-images-idx3-ubyte";
-    std::string labels_file = "./src/data/train-labels-idx1-ubyte";
+    std::string images_file = "./data/train-images-idx3-ubyte";
+    std::string labels_file = "./data/train-labels-idx1-ubyte";
 
     NeuralNetwork<DenseLayer> nn;
-    ActivationFunction* sigmoid = new SigmoidFunction();
-    ActivationFunction* softmax = new SoftmaxFunction();
+    ActivationFunction* sigmoid = new activations::Sigmoid();
+    ActivationFunction* softmax = new activations::Softmax();
     
     nn.addLayer(new DenseLayer(784, 16, sigmoid));
     nn.addLayer(new DenseLayer(16, 16, sigmoid));
-    nn.addLayer(new DenseLayer(16, 10, softmax, true));
+    nn.addLayer(new DenseLayer(16, 10, softmax, true)); // Output layer
     
-    std::vector<Matrix> input = loadMNISTImages(images_file);
+    std::vector<Matrix> input = utils::loadMNISTImages(images_file);
     // For flattening the input data (from 28x28 to 1x784) in place
     for (auto& img : input) {
-        Matrix flattened(1, 784);
-        for (int i = 0; i < 28; i++) {
-            for (int j = 0; j < 28; j++) {
-                flattened.data[0][i * 28 + j] = img.data[i][j];
-            }
-        }
-        img = flattened;  // Replace with flattened version
+        img = utils::flatten(img);  // Replace with flattened version
     }
     
-    
-    std::vector<int> t = loadMNISTLabels(labels_file);
+    std::vector<int> t = utils::loadMNISTLabels(labels_file);
     std::vector<Matrix> target(t.size());
     // Converting from int to Matrix(1, 10), with 1 in the correct index
     for (int i = 0; i < t.size(); i++) {
-        target[i] = Matrix(1, 10);
-        target[i].data[0][t[i]] = 1;
+        target[i] = utils::createMNISTTargetMatrix(t[i]);
     } 
 
     
     // Data training
-    // nn.loadFromFile("./src/models/model_v2.1");
+    nn.loadFromFile("./src/models/model_v2.1");
 
-    // auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::high_resolution_clock::now();
 
-    // for (int i = 0; i < 200; i++) {
-    //     std::cout << "Trianing: " << i << "=================================================================================================================================================================================================================================================================================================================================" << std::endl;
-    //     nn.train(input[i], target[i], 300, 0.01);
-    // }
+    for (int i = 0; i < input.size(); i++) {
+        std::cout << "Trianing number: " << i << std::endl;
+        nn.train(input[i], target[i], 300, 0.01);
+    }
     
-    // auto end_time = std::chrono::high_resolution_clock::now();
-    // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
-    // std::cout << "Training completed in " << duration << " minutes.\n";
+    auto end_time = std::chrono::high_resolution_clock::now();
+    double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
+    std::cout << "Training completed in " << duration << " minutes.\n";
 
-    // nn.saveToFile("./src/models/model_v2.1");
+    nn.saveToFile("./src/models/model_v2.1");
 
     // ==================================================
 
     nn.loadFromFile("./src/models/model_v2.1");
-    // nn.loadFromFile("test");
 
     int n = 99;
 
@@ -83,7 +71,6 @@ int main() {
     target[n].print();
 
     nn.saveToFile("./src/models/model_v2.1");
-    // nn.saveToFile("test");
 
     // ===================================================
     
@@ -126,11 +113,11 @@ void testSaveAndLoad(const std::string &filename) {
 void testLoadMNIST(const std::string &images_file, const std::string &labels_file) {
     std::cout << "Running MNIST Data Load Test...\n";
 
-    // Load images and labels
-    std::vector<Matrix> images = loadMNISTImages(images_file);
-    std::vector<int> labels = loadMNISTLabels(labels_file);
+    // load images and labels
+    std::vector<Matrix> images = utils::loadMNISTImages(images_file);
+    std::vector<int> labels = utils::loadMNISTLabels(labels_file);
 
-    // Check if images and labels were loaded successfully
+    // check if images and labels were loaded successfully
     if (!images.empty() && !labels.empty()) {
         std::cout << "MNIST Data Loaded Successfully!\n";
         std::cout << "Loaded " << images.size() << " images and " << labels.size() << " labels.\n";
@@ -139,6 +126,6 @@ void testLoadMNIST(const std::string &images_file, const std::string &labels_fil
     }
 }
 
-// Matrix createMNISTTargetMatrix(double label) {
+// Matrix createMNISTTargetMatrix(int label) {
 
 // }

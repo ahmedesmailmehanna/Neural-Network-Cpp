@@ -1,5 +1,13 @@
-g++ -std=c++17 -o main main.cpp matrix.cpp dense_layer.cpp base_layer.cpp mnist_loader.cpp -I./
+compilation command
+
+g++ -std=c++17 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/base_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+
+g++ -std=c++17 -o test tests/test.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/base_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+
+
 
 add try catch statements
 
-make a mkfile
+create a makefile
+
+imgui
