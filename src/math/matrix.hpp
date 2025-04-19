@@ -18,6 +18,7 @@ public:
     ~Matrix();
 
     void randomize();
+    void fill(double value);
     bool isEqual(const Matrix& other) const;
     Matrix operator+(const Matrix &other) const;
     Matrix operator-(const Matrix &other) const;

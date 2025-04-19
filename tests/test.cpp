@@ -1,5 +1,6 @@
 #include "../src/math/matrix.hpp"
 #include "../src/layers/dense_layer.hpp"
+#include "../src/layers/conv_layer.hpp"
 #include "../src/core/neural_network.hpp"
 #include "../src/activations/activations.hpp"
 #include "../src/utils/utils.hpp"
@@ -162,6 +163,29 @@ bool testDenseLayerForward() {
            abs(layer.output.data[0][1] - expected) < 1e-6;
 }
 
+bool testConvLayerForward() {
+    ActivationFunction* relu = new ReLUFunction();
+    ConvLayer layer(3, 1, 0, relu); // 3x3 kernel, stride=1, no padding
+
+    // Initialize kernel with specific values for testing
+    layer.kernel.data[0][0] = 1; layer.kernel.data[0][1] = 0; layer.kernel.data[0][2] = -1;
+    layer.kernel.data[1][0] = 1; layer.kernel.data[1][1] = 0; layer.kernel.data[1][2] = -1;
+    layer.kernel.data[2][0] = 1; layer.kernel.data[2][1] = 0; layer.kernel.data[2][2] = -1;
+
+    // Input matrix
+    Matrix input(5, 5);
+    input.fill(1.0); // Fill with ones for simplicity
+
+    // Perform forward pass
+    layer.forward(input);
+
+    // Expected output size: (5 - 3 + 2*0) / 1 + 1 = 3x3
+    Matrix expectedOutput(3, 3);
+    expectedOutput.fill(0.0); // Fill with expected values based on kernel and input
+
+    return layer.output.isEqual(expectedOutput);
+}
+
 // Neural Network Tests
 bool testNeuralNetworkForward() {
     NeuralNetwork<DenseLayer> nn;
@@ -216,6 +240,12 @@ bool testModelSaveLoad() {
     // nn2.layers[1]->weights.print();
     // nn2.layers[1]->biases.print();
 
+    // auto* l1 = static_cast<DenseLayer*>(nn1.layers[0]);
+    // auto* l2 = static_cast<DenseLayer*>(nn2.layers[0]);
+    
+    // auto* l3 = static_cast<DenseLayer*>(nn1.layers[1]);
+    // auto* l4 = static_cast<DenseLayer*>(nn2.layers[2]);
+
     // Compare the weights and biases of the layers
     return nn1.layers[0]->isEqual(*nn2.layers[0]) && 
            nn1.layers[1]->isEqual(*nn2.layers[1]);
@@ -236,6 +266,7 @@ int main() {
 
     std::cout << "\nRunning Layer Tests..." << std::endl;
     runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
+    runner.runTest("Conv Layer Forward Pass", testConvLayerForward);
 
 
     std::cout << "\nRunning Neural Network Tests..." << std::endl;
@@ -252,4 +283,4 @@ int main() {
     runner.printSummary();
 
     return 0;
-} 
+}

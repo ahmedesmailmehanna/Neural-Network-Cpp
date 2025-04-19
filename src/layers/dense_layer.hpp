@@ -1,12 +1,12 @@
 #ifndef DENSE_LAYER_HPP
 #define DENSE_LAYER_HPP
 
-#include "base_layer.hpp"
+#include "layer.hpp"
 #include "../core/serializable.hpp"
 #include "../math/matrix.hpp"
 #include "../activations/activation_function.hpp"
 
-class DenseLayer : public BaseLayer, public Serializable {
+class DenseLayer : public Layer {
 public:
     Matrix weights, biases; // weight => which neuron/pixels take action // biases => how high before getting active
     Matrix input, output;

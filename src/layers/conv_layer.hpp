@@ -1,14 +1,18 @@
 #ifndef CONV_LAYER_HPP
 #define CONV_LAYER_HPP
 
-#include "base_layer.hpp"
+#include "layer.hpp"
 #include "../math/matrix.hpp"
+#include "../activations/activations.hpp"
 #include "../activations/activation_function.hpp"
+#include "../core/trainable.hpp"
 #include "../core/serializable.hpp"
 
-class ConvLayer : public BaseLayer, public Serializable {
+class ConvLayer : public Layer {
 public:
     int kernel_size, stride, padding;
+    Matrix input;  // Input matrix (image)
+    Matrix output; // Output matrix (feature map)
     Matrix kernel;  // Convolution kernel (filter)
     ActivationFunction* activation;
 

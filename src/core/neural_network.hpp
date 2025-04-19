@@ -3,10 +3,16 @@
 
 #include <vector>
 #include "trainable.hpp"
+#include "../layers/layer.hpp"
+#include "../math/matrix.hpp"
 #include "serializable.hpp"
 
-// Template class for neural network layers
-template <typename LayerType>
+
+// cancel the usage of templates
+// we are going to use polymorphism and smart pointers instead
+// to be able to make a cnn and a dnn in the same class
+
+template<typename LayerType>
 class NeuralNetwork : public Trainable, public Serializable {
 public:
     std::vector<LayerType*> layers;
@@ -34,7 +40,7 @@ public:
             
             // Forward pass
             Matrix output = forward(input);
-            Matrix error = output - target;  // Loss gradient for output layer
+            Matrix error = output - target;  // simple Loss gradient
             
             std::cout << "Error: ";  
             error.print();  // Show the error matrix

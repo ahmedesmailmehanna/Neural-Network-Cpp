@@ -48,7 +48,7 @@ cd Neural-Network-Cpp
 ### Compilation
 ```bash
 # Compile all source files directly
-g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/base_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/layers/layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 ```
 
 ## Framework Components
@@ -60,6 +60,7 @@ g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.c
 
 ### Layers
 - DenseLayer: A fully connected layer with customizable activation functions.
+- ConvLayer: ConvLayer: A convolutional layer supporting filters, strides, padding, and activation functions.
 - More to be added...
 
 ### Activations

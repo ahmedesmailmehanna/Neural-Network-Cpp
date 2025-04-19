@@ -182,6 +182,15 @@ Matrix Matrix::applyFunction(std::function<std::vector<double>(std::vector<doubl
     return result;
 }
 
+// Fill Matrix with a specific value
+void Matrix::fill(double value) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            data[i][j] = value;
+        }
+    }
+}
+
 // Print Matrix
 void Matrix::print() {
     std::cout << "\nMatrix (" << rows << "x" << cols << "):\n";
