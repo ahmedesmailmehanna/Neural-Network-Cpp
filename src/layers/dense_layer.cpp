@@ -31,7 +31,9 @@ void DenseLayer::forward(Matrix &input) {
 }
 
 // Backpropagation: Compute weight and bias updates
-
+// d_output is the gradient of the loss with respect to the output of this layer
+// learning_rate is the step size for updating weights and biases
+// The output of this layer is the input to the next layer, so we need to propagate the error back
 Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
     Matrix delta;
     
@@ -42,23 +44,26 @@ Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
         // Compute derivative of activation
         Matrix d_activation = output.applyFunction([this](std::vector<double> x) { return activation->derivative(x); });
 
-        // Compute delta (error signal)
+        // Compute delta for backpropagation
+        // delta = d_output * activation_derivative(output)
         delta = d_output.elementWiseMultiply(d_activation);
     }
 
     // Compute gradients
-    Matrix d_weights = input.transpose() * delta;
-    Matrix d_biases = delta.sumRows();  // Sum across batch
-    
-    // std::cout << "biases: " << biases.rows << "x" << biases.cols << std::endl;
-    // std::cout << "d_biases: " << d_biases.rows << "x" << d_biases.cols << std::endl;
+    Matrix d_weights = input.transpose() * delta; // Transpose input for correct multiplication
+    // d_weights has shape (input_size, output_size)
+    // d_weights = input^T * delta
 
+    Matrix d_biases = delta.sumRows();  // Sum across rows to get bias gradients
+    // d_biases has shape (1, output_size)
+    
     // Update parameters
     weights = weights - (d_weights * learning_rate);
     biases = biases - (d_biases * learning_rate);
 
     // Propagate error to the previous layer
-    Matrix d_input = delta * weights.transpose();
+    Matrix d_input = delta * weights.transpose(); // d_input has shape (batch_size, input_size)
+    
     return d_input;
 }
 

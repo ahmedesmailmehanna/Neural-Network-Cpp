@@ -112,6 +112,34 @@ bool testMatrixRandomInitialization() {
     return true;
 }
 
+// Test for Matrix Apply Function
+bool testMatrixApplyFunction() {
+    // Create a 2x2 matrix with specific values
+    Matrix m(2, 2);
+    m.data[0][0] = 1.0; m.data[0][1] = -2.0;
+    m.data[1][0] = 3.0; m.data[1][1] = -4.0;
+
+    // Define a lambda function to square each element
+    auto squareFunction = [](std::vector<double>& row) {
+        std::vector<double> result(row.size());
+        for (size_t i = 0; i < row.size(); i++) {
+            result[i] = row[i] * row[i];
+        }
+        return result;
+    };
+
+    // Apply the function to the matrix
+    Matrix result = m.applyFunction(squareFunction);
+
+    // Expected output matrix
+    Matrix expected(2, 2);
+    expected.data[0][0] = 1.0; expected.data[0][1] = 4.0;
+    expected.data[1][0] = 9.0; expected.data[1][1] = 16.0;
+
+    // Compare the result with the expected matrix
+    return result.isEqual(expected);
+}
+
 // Layer Tests
 bool testDenseLayerForward() {
     ActivationFunction* sigmoid = new SigmoidFunction();
@@ -203,7 +231,8 @@ int main() {
     runner.runTest("Matrix Transpose", testMatrixTranspose);
     runner.runTest("Matrix Scalar Multiplication", testMatrixScalarMultiplication);
     runner.runTest("Matrix Random Initialization", testMatrixRandomInitialization);
-
+    runner.runTest("Matrix Apply Function", testMatrixApplyFunction);
+    
 
     std::cout << "\nRunning Layer Tests..." << std::endl;
     runner.runTest("Dense Layer Forward Pass", testDenseLayerForward);
