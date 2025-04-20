@@ -9,9 +9,6 @@
 class DenseLayer : public Layer {
 public:
     Matrix weights, biases; // weight => which neuron/pixels take action // biases => how high before getting active
-    Matrix input, output;
-    ActivationFunction* activation;
-    bool isOutputLayer; // For softmax
 
     DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc);
     DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc, bool isOutputLayer);

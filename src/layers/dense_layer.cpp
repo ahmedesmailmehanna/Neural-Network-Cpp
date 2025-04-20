@@ -5,29 +5,35 @@
 // Weights Matrix has input_size rows and output_size cols
 // Each neuron has 1 bias so the rows are 1
 DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc) 
-    : weights(input_size, output_size), biases(1, output_size), activation(activationFunc) {
+    : weights(input_size, output_size), biases(1, output_size), Layer(activationFunc) {
     weights.randomize();
     biases.randomize();
     isOutputLayer = false;
 }
 DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc, bool isOutputLayer) 
-    : weights(input_size, output_size), biases(1, output_size), activation(activationFunc), isOutputLayer(isOutputLayer) {
+    : weights(input_size, output_size), biases(1, output_size), Layer(activationFunc, isOutputLayer) {
     weights.randomize();
     biases.randomize();
 }
 
 // Forward pass: Computes output = (input * weights) + biases
 void DenseLayer::forward(Matrix &input) {
+// Store the input for backpropagation
     this->input = input;
-    output = (input * weights) + biases;
+    
+    // Compute the forward pass
+    output = input * weights;  // Matrix multiplication
+    output = output + biases;  // Add biases
 
     // Check if the activation function is Softmax and enforce output layer usage
     if (typeid(*activation) == typeid(SoftmaxFunction) && !isOutputLayer) {
         throw std::logic_error("SoftmaxFunction can only be used in the output layer: new DenseLayer(..., true)");
     }
     
-    // Lambda function to use member activation function
-    output = output.applyFunction([this](std::vector<double> x) { return activation->activate(x); }); 
+    // Apply activation function
+    output = output.applyFunction([this](std::vector<double> x) { 
+return activation->activate(x); 
+}); 
 }
 
 // Backpropagation: Compute weight and bias updates
@@ -133,5 +139,5 @@ bool DenseLayer::isEqual(DenseLayer &other) {
 
 // Destructor: Prevent memory leak by deleting activation function
 DenseLayer::~DenseLayer() {
-    delete activation;
+    // delete activation; // not needed as it's managed by Layer class
 }

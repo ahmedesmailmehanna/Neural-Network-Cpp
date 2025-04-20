@@ -2,34 +2,35 @@
 #define NEURAL_NETWORK_HPP
 
 #include <vector>
+#include <memory>
 #include "trainable.hpp"
 #include "../layers/layer.hpp"
 #include "../math/matrix.hpp"
 #include "serializable.hpp"
 
-
 // cancel the usage of templates
 // we are going to use polymorphism and smart pointers instead
 // to be able to make a cnn and a dnn in the same class
 
-template<typename LayerType>
+// template<typename LayerType>
 class NeuralNetwork : public Trainable, public Serializable {
 public:
-    std::vector<LayerType*> layers;
+    std::vector<std::unique_ptr<Layer>> layers;
 
-    void addLayer(LayerType* layer) {
-        layers.push_back(layer);
+    void addLayer(std::unique_ptr<Layer> layer) {
+        layers.push_back(std::move(layer));
     }
 
-    Matrix forward(Matrix input) {
-        for (auto layer : layers) {
-            layer->forward(input);
-            input = layer->output;
+    Matrix forward(const Matrix& input) {
+        Matrix curr = input;
+        for (auto& layer : layers) {
+            layer->forward(curr);
+            curr = layer->output;
 
             std::cout << "Layer Output:";  
-            input.print();  
+            curr.print();  
         }
-        return input;
+        return curr;
     }
 
     void train(Matrix &input, Matrix &target, int epochs, double learning_rate) override {
@@ -70,11 +71,12 @@ public:
         }
     }
 
-    ~NeuralNetwork() {
-        for (auto layer : layers) {
-            delete layer;
-        }
-    }
+    // Destructor is not needed as unique_ptr will automatically clean up the memory
+    // ~NeuralNetwork() { 
+    //     for (auto layer : layers) {
+    //         delete layer;
+    //     }
+    // }
 };
 
 #endif  // NEURAL_NETWORK_HPP

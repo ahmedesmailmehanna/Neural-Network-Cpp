@@ -143,19 +143,19 @@ bool testMatrixApplyFunction() {
 
 // Layer Tests
 bool testDenseLayerForward() {
-    ActivationFunction* sigmoid = new SigmoidFunction();
-    DenseLayer layer(2, 2, sigmoid);
+    ActivationFunction* sig = new SigmoidFunction();
+    DenseLayer layer(2, 2, sig);
     
     // Set specific weights and biases for testing
     layer.weights.data[0][0] = 0.5; layer.weights.data[0][1] = 0.5;
     layer.weights.data[1][0] = 0.5; layer.weights.data[1][1] = 0.5;
     layer.biases.data[0][0] = 0.1; layer.biases.data[0][1] = 0.1;
-
+    
     Matrix input(1, 2);
     input.data[0][0] = 1.0; input.data[0][1] = 1.0;
-
-    layer.forward(input);
     
+    layer.forward(input);
+
     // The output should be sigmoid(1.0 * 0.5 + 1.0 * 0.5 + 0.1) for both neurons
     double expected = 1.0 / (1.0 + exp(-1.1)); // sigmoid(1.1)
     
@@ -188,10 +188,10 @@ bool testConvLayerForward() {
 
 // Neural Network Tests
 bool testNeuralNetworkForward() {
-    NeuralNetwork<DenseLayer> nn;
+    NeuralNetwork nn;
     
-    nn.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
-    nn.addLayer(new DenseLayer(2, 1, new activations::Softmax(), true)); // Output layer
+    nn.addLayer(std::make_unique<DenseLayer>(2, 2, new activations::Sigmoid()));
+    nn.addLayer(std::make_unique<DenseLayer>(2, 1, new activations::Softmax(), true)); // Output layer
     
     Matrix input(1, 2);
     input.data[0][0] = 1.0; input.data[0][1] = 1.0;
@@ -221,34 +221,39 @@ bool testMNISTDataLoading() {
 
 // Model Save/Load Tests
 bool testModelSaveLoad() {
-    NeuralNetwork<DenseLayer> nn1;
+    // Create first network
+    NeuralNetwork nn1;
     
-    nn1.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
-    nn1.addLayer(new DenseLayer(2, 1, new activations::Sigmoid()));
+    nn1.addLayer(std::make_unique<DenseLayer>(2, 2, new activations::Sigmoid()));
+    nn1.addLayer(std::make_unique<DenseLayer>(2, 1, new activations::Sigmoid()));
 
     // Save the model
     nn1.saveToFile("./tests/test_model");
 
     // Create a new network and load the saved model
-    NeuralNetwork<DenseLayer> nn2;
-    nn2.addLayer(new DenseLayer(2, 2, new activations::Sigmoid()));
-    nn2.addLayer(new DenseLayer(2, 1, new activations::Sigmoid()));
+    NeuralNetwork nn2;
+    nn2.addLayer(std::make_unique<DenseLayer>(2, 2, new activations::Sigmoid()));
+    nn2.addLayer(std::make_unique<DenseLayer>(2, 1, new activations::Sigmoid()));
     nn2.loadFromFile("./tests/test_model");
 
-    // nn1.layers[1]->weights.print();
-    // nn1.layers[1]->biases.print();
-    // nn2.layers[1]->weights.print();
-    // nn2.layers[1]->biases.print();
+    // Cast the Layer pointers to DenseLayer pointers
+    auto* l1 = dynamic_cast<DenseLayer*>(nn1.layers[0].get());
+    auto* l2 = dynamic_cast<DenseLayer*>(nn2.layers[0].get());
+    auto* l3 = dynamic_cast<DenseLayer*>(nn1.layers[1].get());
+    auto* l4 = dynamic_cast<DenseLayer*>(nn2.layers[1].get());
 
-    // auto* l1 = static_cast<DenseLayer*>(nn1.layers[0]);
-    // auto* l2 = static_cast<DenseLayer*>(nn2.layers[0]);
-    
-    // auto* l3 = static_cast<DenseLayer*>(nn1.layers[1]);
-    // auto* l4 = static_cast<DenseLayer*>(nn2.layers[2]);
+    if (!l1 || !l2 || !l3 || !l4) {
+        std::cerr << "Dynamic cast failed: One or more layers are not DenseLayers" << std::endl;
+        return false;
+    }
 
-    // Compare the weights and biases of the layers
-    return nn1.layers[0]->isEqual(*nn2.layers[0]) && 
-           nn1.layers[1]->isEqual(*nn2.layers[1]);
+    // Compare weights and biases
+    bool weightsMatch = l1->weights.isEqual(l2->weights) && 
+                        l3->weights.isEqual(l4->weights);
+    bool biasesMatch = l1->biases.isEqual(l2->biases) && 
+                       l3->biases.isEqual(l4->biases);
+
+    return weightsMatch && biasesMatch;
 }
 
 int main() {

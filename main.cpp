@@ -11,13 +11,10 @@ int main() {
     std::string images_file = "./data/train-images-idx3-ubyte";
     std::string labels_file = "./data/train-labels-idx1-ubyte";
 
-    NeuralNetwork<DenseLayer> nn;
-    ActivationFunction* sigmoid = new activations::Sigmoid();
-    ActivationFunction* softmax = new activations::Softmax();
-    
-    nn.addLayer(new DenseLayer(784, 16, sigmoid));
-    nn.addLayer(new DenseLayer(16, 16, sigmoid));
-    nn.addLayer(new DenseLayer(16, 10, softmax, true)); // Output layer
+    NeuralNetwork nn;
+    nn.addLayer(std::make_unique<DenseLayer>(784, 16, new activations::Sigmoid()));
+    nn.addLayer(std::make_unique<DenseLayer>(16, 16, new activations::Sigmoid()));
+    nn.addLayer(std::make_unique<DenseLayer>(16, 10, new activations::Softmax(), true)); // Output layer
     
     std::vector<Matrix> input = utils::loadMNISTImages(images_file);
     // For flattening the input data (from 28x28 to 1x784) in place
@@ -35,13 +32,13 @@ int main() {
     
     // Data training
 
-    nn.loadFromFile("./src/models/model_v2.1");
+    nn.loadFromFile("./src/models/model_v3.1");
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < 5000; i++) {
         std::cout << "Trianing number: " << i << std::endl;
-        nn.train(input[i], target[i], 300, 0.01);
+        nn.train(input[i], target[i], 200, 0.01);
     }
     
     auto end_time = std::chrono::high_resolution_clock::now();
@@ -49,11 +46,11 @@ int main() {
     double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
     std::cout << "Training completed in " << duration << " minutes.\n";
 
-    nn.saveToFile("./src/models/model_v2.1");
+    nn.saveToFile("./src/models/model_v3.1");
 
     // ==================================================
 
-    // nn.loadFromFile("./src/models/model_v2.1");
+    // nn.loadFromFile("./src/models/model_v3.1");
 
     // int n = 99;
     // for (int i = 0; i < 3; i++) {
@@ -65,7 +62,7 @@ int main() {
     // out.print();
     // target[n].print();
 
-    // nn.saveToFile("./src/models/model_v2.1");
+    // nn.saveToFile("./src/models/model_v3.1");
 
     // ===================================================
     

@@ -1,8 +1,8 @@
 compilation command
 
-g++ -std=c++17 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/layers/layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+g++ -std=c++17 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 
-g++ -std=c++17 -o test tests/test.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/layers/layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+g++ -std=c++17 -o test tests/test.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 
 
 

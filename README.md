@@ -23,7 +23,7 @@ This framework provides the building blocks for creating and training neural net
 
 ## Features
 
-- Layer Support: Includes fully connected (dense) layers.
+- Layer Support: Includes fully connected (dense) layers and Convolutional layers.
 - Activation Functions: Built-in support for ReLU, Sigmoid, and Softmax.
 - Dataset Utilities: Functions for loading and preprocessing the MNIST dataset.
 - Serialization: Save and load models for reuse.
@@ -48,7 +48,8 @@ cd Neural-Network-Cpp
 ### Compilation
 ```bash
 # Compile all source files directly
-g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/layers/layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+
 ```
 
 ## Framework Components
@@ -76,10 +77,10 @@ g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.c
 ### Creating a Neural Network
 1. Define the network structure:
 ```c++
-NeuralNetwork<DenseLayer> nn;
-nn.addLayer(new DenseLayer(784, 16, new activations::Sigmoid()));
-nn.addLayer(new DenseLayer(16, 16, new activations::Sigmoid()));
-nn.addLayer(new DenseLayer(16, 10, new activations::Softmax(), true)); // Output layer must be identified with a true flag
+NeuralNetwork nn;
+nn.addLayer(std::make_unique<DenseLayer>(784, 16, new activations::Sigmoid()));
+nn.addLayer(std::make_unique<DenseLayer>(16, 16, new activations::Sigmoid()));
+nn.addLayer(std::make_unique<DenseLayer>(16, 10, new activations::Softmax(), true)); // Output layer must be identified with a true flag
 ```
 2. Load and preprocess the dataset:
 ```c++
@@ -108,9 +109,9 @@ nn.saveToFile("./models/model_v1");
 Example 1: Training a Neural Network
 ```c++
 NeuralNetwork<DenseLayer> nn;
-nn.addLayer(new DenseLayer(784, 16, new activations::Sigmoid()));
-nn.addLayer(new DenseLayer(16, 16, new activations::Sigmoid()));
-nn.addLayer(new DenseLayer(16, 10, new activations::Softmax()));
+nn.addLayer(std::make_unique<DenseLayer>(784, 16, new activations::Sigmoid()));
+nn.addLayer(std::make_unique<DenseLayer>(16, 16, new activations::Sigmoid()));
+nn.addLayer(std::make_unique<DenseLayer>(16, 10, new activations::Softmax()));
 
 std::vector<Matrix> input = utils::loadMNISTImages("./data/train-images-idx3-ubyte");
 for (auto& img : input) {
