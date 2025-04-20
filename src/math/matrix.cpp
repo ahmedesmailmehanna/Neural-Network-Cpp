@@ -29,10 +29,10 @@ Matrix::~Matrix() {
 }
 
 // Random Initialization (For weights)
-void Matrix::randomize() {
+void Matrix::randomize(double lowerLimit, double upperLimit) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dist(-0.1, 0.1);
+    std::uniform_real_distribution<> dist(lowerLimit, upperLimit); 
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {

@@ -6,14 +6,18 @@
 // Each neuron has 1 bias so the rows are 1
 DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc) 
     : weights(input_size, output_size), biases(1, output_size), Layer(activationFunc) {
-    weights.randomize();
-    biases.randomize();
+    // xavier/glorot initialization
+    double limit = sqrt(6.0 / (input_size + output_size));
+    weights.randomize(-limit, limit);
+    biases.randomize(-0.1, 0.1);
     isOutputLayer = false;
 }
 DenseLayer::DenseLayer(int input_size, int output_size, ActivationFunction* activationFunc, bool isOutputLayer) 
     : weights(input_size, output_size), biases(1, output_size), Layer(activationFunc, isOutputLayer) {
-    weights.randomize();
-    biases.randomize();
+    // xavier/glorot initialization
+    double limit = sqrt(6.0 / (input_size + output_size));
+    weights.randomize(-limit, limit);
+    biases.randomize(-0.1, 0.1);
 }
 
 // Forward pass: Computes output = (input * weights) + biases

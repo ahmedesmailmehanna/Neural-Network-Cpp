@@ -242,6 +242,10 @@ bool testModelSaveLoad() {
     auto* l3 = dynamic_cast<DenseLayer*>(nn1.layers[1].get());
     auto* l4 = dynamic_cast<DenseLayer*>(nn2.layers[1].get());
 
+    // Check if the cast was successful
+    // If the cast fails, l1, l2, l3, or l4 will be nullptr
+    // Or we could have just used a static_cast, but we want to be sure
+    // that the layers are indeed DenseLayers for testing purposes and avoiding undefined behavior
     if (!l1 || !l2 || !l3 || !l4) {
         std::cerr << "Dynamic cast failed: One or more layers are not DenseLayers" << std::endl;
         return false;
@@ -254,6 +258,74 @@ bool testModelSaveLoad() {
                        l3->biases.isEqual(l4->biases);
 
     return weightsMatch && biasesMatch;
+}
+
+// Simple Model Accuracy Test with XOR Problem
+bool testModelAccuracy() {
+    NeuralNetwork nn;
+    nn.addLayer(std::make_unique<DenseLayer>(2, 4, new activations::Sigmoid()));
+    nn.addLayer(std::make_unique<DenseLayer>(4, 2, new activations::Softmax(), true));
+
+    // test data (XOR problem)
+    std::vector<Matrix> inputs = {
+        Matrix(1, 2), Matrix(1, 2),
+        Matrix(1, 2), Matrix(1, 2)
+    };
+    std::vector<Matrix> targets = {
+        Matrix(1, 2), Matrix(1, 2),
+        Matrix(1, 2), Matrix(1, 2)
+    };
+
+    // 0 XOR 0 = 0, 0 XOR 1 = 1, 1 XOR 0 = 1, 1 XOR 1 = 0
+    // Initialize XOR data                              // 0                       // 1
+    inputs[0].data[0][0] = 0; inputs[0].data[0][1] = 0; targets[0].data[0][0] = 1; targets[0].data[0][1] = 0;
+    inputs[1].data[0][0] = 0; inputs[1].data[0][1] = 1; targets[1].data[0][0] = 0; targets[1].data[0][1] = 1;
+    inputs[2].data[0][0] = 1; inputs[2].data[0][1] = 0; targets[2].data[0][0] = 0; targets[2].data[0][1] = 1;
+    inputs[3].data[0][0] = 1; inputs[3].data[0][1] = 1; targets[3].data[0][0] = 1; targets[3].data[0][1] = 0;
+
+
+    nn.loadFromFile("./src/models/xor_model");
+
+
+
+    // for (int i = 0; i < inputs.size(); i++) {
+    //     nn.train(inputs[i], targets[i], 1000, 0.1);
+    // }
+
+    // for (int epoch = 0; epoch < 100; epoch++) {
+
+    //     // Train on each sample
+    //     for (int i = 0; i < inputs.size(); i++) {
+    //         nn.train(inputs[i], targets[i], 20, 0.01);
+    //     }
+        
+    // }
+
+    // nn.saveToFile("./src/models/xor_model");
+    
+        
+    int correct = 0;
+    for (int i = 0; i < inputs.size(); i++) {
+        Matrix output = nn.forward(inputs[i]);
+
+        // For Softmax output with 2 neurons:
+        // output[0] represents probability of class 0
+        // output[1] represents probability of class 1
+
+        cout<<"Predicted: " << output.data[0][0] << ", " << output.data[0][1] << endl;
+        cout<<"Actual: " << targets[i].data[0][0] << ", " << targets[i].data[0][1] << endl;
+        
+        bool predicted = output.data[0][1] > output.data[0][0]; // predict 1 if index 1 is greater than index 0, else 0
+        bool actual = targets[i].data[0][1] > targets[i].data[0][0]; // actual 1 if index 1 is greater than index 0, else 0
+        if (predicted == actual) {
+            correct++;
+        }
+    }
+
+    double accuracy = static_cast<double>(correct) / inputs.size();
+    std::cout << "\nFinal accuracy: " << accuracy * 100 << "%\n";
+
+    return accuracy >= 0.75; // Expect at least 75% accuracy
 }
 
 int main() {
@@ -284,6 +356,9 @@ int main() {
 
     std::cout << "\nRunning Model Save/Load Tests..." << std::endl;
     runner.runTest("Model Save and Load", testModelSaveLoad);
+
+    std::cout << "\nRunning Model Accuracy Tests..." << std::endl;
+    runner.runTest("Model Accuracy", testModelAccuracy);
 
     runner.printSummary();
 

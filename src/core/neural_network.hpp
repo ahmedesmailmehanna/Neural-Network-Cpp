@@ -18,7 +18,7 @@ public:
     std::vector<std::unique_ptr<Layer>> layers;
 
     void addLayer(std::unique_ptr<Layer> layer) {
-        layers.push_back(std::move(layer));
+        layers.push_back(std::move(layer)); // move ownership of the layer to the vector
     }
 
     Matrix forward(const Matrix& input) {
@@ -36,20 +36,54 @@ public:
     void train(Matrix &input, Matrix &target, int epochs, double learning_rate) override {
         std::cout << "Training started for " << epochs << " epochs...\n";
         
-        for (int i = 0; i < epochs; i++) {
-            std::cout << "Epoch: " << i + 1 << '\n';
+        for (int epoch = 0; epoch < epochs; epoch++) {
+            std::cout << "Epoch: " << epoch + 1 << '\n';
             
             // Forward pass
             Matrix output = forward(input);
-            Matrix error = output - target;  // simple Loss gradient
+
+            // Calculate error (loss) between output and target
+            Matrix error = output - target;
             
-            std::cout << "Error: ";  
-            error.print();  // Show the error matrix
+            // std::cout << "Error: ";  
+            // error.print();  // Show the final error matrix
             
             // Backward pass (iterate from last to first layer)
             Matrix d_input = error;  // Start with error at output layer
             for (auto it = layers.rbegin(); it != layers.rend(); ++it) {
                 d_input = (*it)->backward(d_input, learning_rate);  // Pass the new gradient
+            }
+        }
+    
+        std::cout << "Training completed!\n";
+    }
+
+    void train_batch(std::vector<Matrix> &inputs, std::vector<Matrix> &targets, int epochs, double learning_rate) override {
+        if (inputs.size() != targets.size()) {
+            throw std::invalid_argument("Number of inputs must match number of targets");
+        }
+
+        std::cout << "Training started for " << epochs << " epochs...\n";
+        
+        for (int epoch = 0; epoch < epochs; epoch++) {
+            std::cout << "Batch epoch: " << epoch + 1 << '\n';
+            // Iterate over each input-target pair
+            for (int i = 0; i < inputs.size(); i++) {
+            
+                // Forward pass
+                Matrix output = forward(inputs[i]);
+
+                // Calculate error (loss) between output and target
+                Matrix error = output - targets[i];
+
+                // std::cout << "Error: ";  
+                // error.print();  // Show the final error matrix
+            
+                // Backward pass (iterate from last to first layer)
+                Matrix d_input = error;  // Start with error at output layer
+                for (auto it = layers.rbegin(); it != layers.rend(); ++it) {
+                d_input = (*it)->backward(d_input, learning_rate);  // Pass the new gradient
+                }
             }
         }
     

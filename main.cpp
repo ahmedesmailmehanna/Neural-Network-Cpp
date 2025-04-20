@@ -32,35 +32,69 @@ int main() {
     
     // Data training
 
-    nn.loadFromFile("./src/models/model_v3.1");
+    // nn.loadFromFile("./src/models/model_v3.1");
 
-    auto start_time = std::chrono::high_resolution_clock::now();
+    // auto start_time = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < 5000; i++) {
-        std::cout << "Trianing number: " << i << std::endl;
-        nn.train(input[i], target[i], 200, 0.01);
+    // for (int i = 0; i < 5000; i++) {
+    //     std::cout << "Trianing number: " << i << std::endl;
+    //     nn.train(input[i], target[i], 200, 0.01);
+    // }
+    
+    // auto end_time = std::chrono::high_resolution_clock::now();
+
+    // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
+    // std::cout << "Training completed in " << duration << " minutes.\n";
+    
+    // nn.saveToFile("./src/models/model_v3.1");
+    
+    // ==================================================
+    // Batch data training
+    
+    // nn.loadFromFile("./src/models/model_v3.1");
+    
+    int n = 100; // Number of samples in the batch
+    std::vector<Matrix> batch_input(n);
+    std::vector<Matrix> batch_target(n);
+    
+    for (int i = 0; i < n; i++) {
+        batch_input[i] = input[i];
+        batch_target[i] = target[i];
     }
     
+    auto start_time = std::chrono::high_resolution_clock::now();
+    nn.train_batch(batch_input, batch_target, 100, 0.01);
     auto end_time = std::chrono::high_resolution_clock::now();
 
     double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
     std::cout << "Training completed in " << duration << " minutes.\n";
-
+    
     nn.saveToFile("./src/models/model_v3.1");
 
     // ==================================================
+    // first n inputs accuracy
 
-    // nn.loadFromFile("./src/models/model_v3.1");
+    nn.loadFromFile("./src/models/model_v3.1");
 
-    // int n = 99;
-    // for (int i = 0; i < 3; i++) {
-    //     nn.train(input[n + i], target[n + i], 10, 0.01);
-    // }
+    n = 100; // Number of samples to test
+    int correct = 0;
+    for (int i = 0; i < n; i++) {
+        Matrix output = nn.forward(input[i]);
 
-    // Matrix out = nn.forward(input[n]);
+        int max = 0;
+        for (int j = 0; j < output.cols; j++) {
+            if (output.data[0][j] > output.data[0][max]) {
+                max = j;
+            }
+        }
+        std::cout << "Predicted: " << max << ", Actual: " << labels[i] << std::endl;
+        if (max == labels[i]) {
+            correct++;
+        }
+    }
 
-    // out.print();
-    // target[n].print();
+    double accuracy = static_cast<double>(correct) / n;
+    std::cout << "\nFinal accuracy: " << accuracy * 100 << "%\n";
 
     // nn.saveToFile("./src/models/model_v3.1");
 

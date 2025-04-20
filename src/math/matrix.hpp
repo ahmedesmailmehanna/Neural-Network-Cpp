@@ -17,7 +17,7 @@ public:
     Matrix(const Matrix &other);
     ~Matrix();
 
-    void randomize();
+    void randomize(double lowerLimit = -0.1, double upperLimit = 0.1);
     void fill(double value);
     bool isEqual(const Matrix& other) const;
     Matrix operator+(const Matrix &other) const;
