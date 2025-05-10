@@ -4,8 +4,6 @@
 #include "./src/utils/utils.hpp"
 #include <vector>
 #include <chrono> // To Measure time
-#include <string>
-#include <stack>
 
 int main() {
     std::string images_file = "./data/train-images-idx3-ubyte";
@@ -84,7 +82,7 @@ int main() {
         int max = 0;
         for (int j = 0; j < output.cols; j++) {
             if (output.data[0][j] > output.data[0][max]) {
-                max = j;
+                max = j; // maximum probability
             }
         }
         std::cout << "Predicted: " << max << ", Actual: " << labels[i] << std::endl;

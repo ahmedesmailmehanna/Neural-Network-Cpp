@@ -80,44 +80,64 @@ Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
 
 // Save weights and biases to file
 void DenseLayer::saveToFile(const std::string &filename) {
-    std::ofstream file(filename, std::ios::binary);
-    if (!file) {
-        std::cerr << "Error: Could not create file " << filename << std::endl;
-        return;
-    }
+    try {
+        if (filename.empty()) {
+            throw std::invalid_argument("Filename cannot be empty");
+        }
 
-    std::cout << "Saving weights and biases to " << filename << std::endl;
+        std::ofstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Error: Could not create file " << filename << std::endl;
+            return;
+        }
 
-    for (int i = 0; i < weights.rows; i++) {
-        file.write((char*)weights.data[i], weights.cols * sizeof(double));
-    }
-    for (int i = 0; i < biases.rows; i++) {
-        file.write((char*)biases.data[i], biases.cols * sizeof(double));
-    }
+        std::cout << "Saving weights and biases to " << filename << std::endl;
 
-    file.close();
-    std::cout << "File saved successfully!\n";
+        for (int i = 0; i < weights.rows; i++) {
+            file.write((char*)weights.data[i], weights.cols * sizeof(double));
+        }
+        for (int i = 0; i < biases.rows; i++) {
+            file.write((char*)biases.data[i], biases.cols * sizeof(double));
+        }
+
+        file.close();
+        std::cout << "File saved successfully!\n";
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error saving layer: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 // Load weights and biases from file
 void DenseLayer::loadFromFile(const std::string &filename) {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file) {
-        std::cerr << "Error: Could not open file " << filename << " for loading!" << std::endl;
-        return;
-    }
+    try {
+        if (filename.empty()) {
+            throw std::invalid_argument("Filename cannot be empty");
+        }
 
-    std::cout << "Loading weights and biases from " << filename << std::endl;
+        std::ifstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Error: Could not open file " << filename << " for loading!" << std::endl;
+            return;
+        }
 
-    for (int i = 0; i < weights.rows; i++) {
-        file.read((char*)weights.data[i], weights.cols * sizeof(double));
-    }
-    for (int i = 0; i < biases.rows; i++) {
-        file.read((char*)biases.data[i], biases.cols * sizeof(double));
-    }
+        std::cout << "Loading weights and biases from " << filename << std::endl;
 
-    file.close();
-    std::cout << "File loaded successfully!\n";
+        for (int i = 0; i < weights.rows; i++) {
+            file.read((char*)weights.data[i], weights.cols * sizeof(double));
+        }
+        for (int i = 0; i < biases.rows; i++) {
+            file.read((char*)biases.data[i], biases.cols * sizeof(double));
+        }
+
+        file.close();
+        std::cout << "File loaded successfully!\n";
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error loading layer: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 // Compares two layers for testing

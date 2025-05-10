@@ -108,7 +108,7 @@ nn.saveToFile("./models/model_v1");
 
 Example 1: Training a Neural Network
 ```c++
-NeuralNetwork<DenseLayer> nn;
+NeuralNetwork nn;
 nn.addLayer(std::make_unique<DenseLayer>(784, 16, new activations::Sigmoid()));
 nn.addLayer(std::make_unique<DenseLayer>(16, 16, new activations::Sigmoid()));
 nn.addLayer(std::make_unique<DenseLayer>(16, 10, new activations::Softmax()));

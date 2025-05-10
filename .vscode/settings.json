@@ -54,5 +54,12 @@
         "format": "cpp",
         "span": "cpp",
         "variant": "cpp"
+    },
+    "makefile.configureOnOpen": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
     }
 }

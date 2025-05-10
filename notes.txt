@@ -1,13 +1,34 @@
-compilation command
-
-g++ -std=c++17 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
-
-g++ -std=c++17 -o test tests/test.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+compilation command... Cmake later
 
 
+usage example (contains accuracy test for model v3.1)
+g++ -std=c++17 -o main main.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 
-add try catch statements
+functionality testing
+g++ -std=c++17 -o test tests/test.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 
-create a makefile
+
 
 imgui
+
+tensors, broadcasting, optimizers
+
+CUDA or OpenCL for gpu
+
+class Layer {
+public:
+    virtual Tensor forward(const Tensor& input) = 0;
+    virtual Tensor backward(const Tensor& grad_output) = 0;
+    virtual void update_weights(float learning_rate) {}
+    virtual ~Layer() = default;
+};
+
+activations should be layers
+
+optimizer steps
+
+use tensor instead of matrix
+
+conv 2d layer
+
+batchnorm, softmaxCrossEntropy

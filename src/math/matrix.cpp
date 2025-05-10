@@ -6,11 +6,22 @@ Matrix::Matrix() : rows(0), cols(0), data(nullptr) {}
 
 // Constructor: Initializes matrix with given rows and columns
 Matrix::Matrix(int r, int c) : rows(r), cols(c) {
-    data = new double*[rows];
-    for (int i = 0; i < rows; i++) {
-        data[i] = new double[cols](); // () to initialize with zeros 0.0
+    try {
+        if (r <= 0 || c <= 0) {
+            throw std::invalid_argument("Matrix dimensions must be positive");
+        }
+
+        data = new double*[rows];
+        for (int i = 0; i < rows; i++) {
+            data[i] = new double[cols](); // () for initializing with zeros 0.0
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error creating matrix: " << e.what() << std::endl;
+        throw;
     }
 }
+
 // Copy Constructor: Deep copy
 Matrix::Matrix(const Matrix &other) : rows(other.rows), cols(other.cols) {
     data = new double*[rows];
@@ -22,22 +33,39 @@ Matrix::Matrix(const Matrix &other) : rows(other.rows), cols(other.cols) {
 
 // Destructor: Frees allocated memory to prevent memory leaks
 Matrix::~Matrix() {
-    for (int i = 0; i < rows; i++) {
-        delete[] data[i];
+    try {
+        if (data) {
+            for (int i = 0; i < rows; i++) {
+                delete[] data[i];
+            }
+            delete[] data;
+        }
     }
-    delete[] data;
+    catch (const std::exception& e) {
+        std::cerr << "Error in matrix destructor: " << e.what() << std::endl;
+    }
 }
 
 // Random Initialization (For weights)
 void Matrix::randomize(double lowerLimit, double upperLimit) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dist(lowerLimit, upperLimit); 
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            data[i][j] = dist(gen);
+    try {
+        if (lowerLimit >= upperLimit) {
+            throw std::invalid_argument("Lower limit must be less than upper limit");
         }
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dist(lowerLimit, upperLimit); 
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i][j] = dist(gen);
+            }
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error in matrix randomization: " << e.what() << std::endl;
+        throw;
     }
 }
 
@@ -53,7 +81,6 @@ bool Matrix::isEqual(const Matrix& other) const {
     }
     return true;
 }
-
 
 // Operator Overloading for Matrix Addition
 Matrix Matrix::operator+(const Matrix &other) const {
@@ -107,7 +134,6 @@ Matrix Matrix::sumRows() const {
     }
     return result;
 }
-
 
 // Operator Overloading for Matrix Multiplication
 Matrix Matrix::operator*(const Matrix &other) const {

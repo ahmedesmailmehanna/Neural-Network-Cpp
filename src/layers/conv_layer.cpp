@@ -77,38 +77,66 @@ Matrix ConvLayer::backward(Matrix &d_output, double learning_rate) {
 }
 
 void ConvLayer::saveToFile(const std::string &filename) {
-    std::ofstream file(filename, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error("Could not open file for writing: " + filename);
-    }
+    try {
+        if (filename.empty()) {
+            throw std::invalid_argument("Filename cannot be empty");
+        }
 
-    // Save kernel dimensions and data
-    file.write((char*)&kernel_size, sizeof(kernel_size));
-    for (int i = 0; i < kernel_size; i++) {
-        file.write((char*)kernel.data[i], kernel_size * sizeof(double));
-    }
+        std::ofstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Error: Could not create file " << filename << std::endl;
+            return;
+        }
 
-    file.close();
+        std::cout << "Saving kernel to " << filename << std::endl;
+
+        // Save kernel dimensions and data
+        file.write((char*)&kernel_size, sizeof(kernel_size));
+        for (int i = 0; i < kernel_size; i++) {
+            file.write((char*)kernel.data[i], kernel_size * sizeof(double));
+        }
+
+        file.close();
+        std::cout << "File saved successfully!\n";
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error saving conv layer: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 void ConvLayer::loadFromFile(const std::string &filename) {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file) {
-        throw std::runtime_error("Could not open file for reading: " + filename);
-    }
+    try {
+        if (filename.empty()) {
+            throw std::invalid_argument("Filename cannot be empty");
+        }
 
-    // Load kernel dimensions and data
-    int loaded_kernel_size;
-    file.read((char*)&loaded_kernel_size, sizeof(loaded_kernel_size));
-    if (loaded_kernel_size != kernel_size) {
-        throw std::runtime_error("Kernel size mismatch in file: " + filename);
-    }
+        std::ifstream file(filename, std::ios::binary);
+        if (!file) {
+            std::cerr << "Error: Could not open file " << filename << " for loading!" << std::endl;
+            return;
+        }
 
-    for (int i = 0; i < kernel_size; i++) {
-        file.read((char*)kernel.data[i], kernel_size * sizeof(double));
-    }
+        std::cout << "Loading kernel from " << filename << std::endl;
 
-    file.close();
+        // Load kernel dimensions and data
+        int loaded_kernel_size;
+        file.read((char*)&loaded_kernel_size, sizeof(loaded_kernel_size));
+        if (loaded_kernel_size != kernel_size) {
+            throw std::runtime_error("Kernel size mismatch in file: " + filename);
+        }
+
+        for (int i = 0; i < kernel_size; i++) {
+            file.read((char*)kernel.data[i], kernel_size * sizeof(double));
+        }
+
+        file.close();
+        std::cout << "File loaded successfully!\n";
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error loading conv layer: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 ConvLayer::~ConvLayer() {
