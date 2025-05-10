@@ -4,6 +4,9 @@
 #include "./src/utils/utils.hpp"
 #include <vector>
 #include <chrono> // To Measure time
+#include <iostream>
+#include <string>
+#include <memory> // For smart pointers
 
 int main() {
     std::string images_file = "./data/train-images-idx3-ubyte";
@@ -32,17 +35,17 @@ int main() {
 
     // nn.loadFromFile("./src/models/model_v3.1");
 
-    // auto start_time = std::chrono::high_resolution_clock::now();
+    // // auto start_time = std::chrono::high_resolution_clock::now();
 
-    // for (int i = 0; i < 5000; i++) {
+    // for (int i = 0; i < 100; i++) {
     //     std::cout << "Trianing number: " << i << std::endl;
     //     nn.train(input[i], target[i], 200, 0.01);
     // }
     
-    // auto end_time = std::chrono::high_resolution_clock::now();
+    // // auto end_time = std::chrono::high_resolution_clock::now();
 
-    // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
-    // std::cout << "Training completed in " << duration << " minutes.\n";
+    // // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
+    // // std::cout << "Training completed in " << duration << " minutes.\n";
     
     // nn.saveToFile("./src/models/model_v3.1");
     
@@ -51,32 +54,32 @@ int main() {
     
     // nn.loadFromFile("./src/models/model_v3.1");
     
-    int n = 100; // Number of samples in the batch
-    std::vector<Matrix> batch_input(n);
-    std::vector<Matrix> batch_target(n);
+    // int n = 100; // Number of samples in the batch
+    // std::vector<Matrix> batch_input(n);
+    // std::vector<Matrix> batch_target(n);
     
-    for (int i = 0; i < n; i++) {
-        batch_input[i] = input[i];
-        batch_target[i] = target[i];
-    }
+    // for (int i = 0; i < n; i++) {
+    //     batch_input[i] = input[i];
+    //     batch_target[i] = target[i];
+    // }
     
-    auto start_time = std::chrono::high_resolution_clock::now();
-    nn.train_batch(batch_input, batch_target, 100, 0.01);
-    auto end_time = std::chrono::high_resolution_clock::now();
+    // auto start_time = std::chrono::high_resolution_clock::now();
+    // nn.train_batch(batch_input, batch_target, 100, 0.01);
+    // auto end_time = std::chrono::high_resolution_clock::now();
 
-    double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
-    std::cout << "Training completed in " << duration << " minutes.\n";
+    // double duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() / 60.0;
+    // std::cout << "Training completed in " << duration << " minutes.\n";
     
-    nn.saveToFile("./src/models/model_v3.1");
+    // nn.saveToFile("./src/models/model_v3.1");
 
     // ==================================================
     // first n inputs accuracy
 
     nn.loadFromFile("./src/models/model_v3.1");
 
-    n = 100; // Number of samples to test
+    int m = 100; // Number of samples to test
     int correct = 0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < m; i++) {
         Matrix output = nn.forward(input[i]);
 
         int max = 0;
@@ -91,7 +94,7 @@ int main() {
         }
     }
 
-    double accuracy = static_cast<double>(correct) / n;
+    double accuracy = static_cast<double>(correct) / m;
     std::cout << "\nFinal accuracy: " << accuracy * 100 << "%\n";
 
     // nn.saveToFile("./src/models/model_v3.1");
