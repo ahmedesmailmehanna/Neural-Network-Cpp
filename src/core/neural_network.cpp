@@ -91,6 +91,9 @@ void NeuralNetwork::saveToFile(const std::string &filename) {
     }
 }
 
+
+// add layer metadata checking (and maybe combine the network in one file later)
+
 void NeuralNetwork::loadFromFile(const std::string &filename) {
     try {
         if (filename.empty()) {

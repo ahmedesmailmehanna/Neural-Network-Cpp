@@ -8,7 +8,7 @@
 #include "../math/matrix.hpp"
 #include "serializable.hpp"
 
-// cancel the usage of templates
+// Cancel the usage of templates
 // we are going to use polymorphism and smart pointers instead
 // to be able to make a cnn and a dnn in the same class
 

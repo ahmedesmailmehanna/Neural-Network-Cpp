@@ -1,11 +1,32 @@
-compilation command... Cmake later
+Build system: CMake (see CMakeLists.txt / CMakePresets.json)
 
+configure + build (uses the "default" preset: Ninja, Release, -O3)
+cmake --preset default
+cmake --build --preset default
 
-usage example (contains accuracy test for model v3.1)
-g++ -std=c++17 -o main main.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+run the usage example (built as ./build/main, contains accuracy test for model v3.1)
+./build/main
 
-functionality testing
-g++ -std=c++17 -o test tests/test.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+run the test suite (built as ./build/test)
+./build/test
+# or, via CTest (catches failures by scanning stdout for "FAILED", since
+# test.cpp's main() currently always returns 0 - see the NOTE in CMakeLists.txt)
+ctest --preset default
+
+build only the library, skip the example/tests
+cmake --preset default -DNNCPP_BUILD_EXAMPLE=OFF -DNNCPP_BUILD_TESTS=OFF
+
+debug build (no optimization, debug symbols)
+cmake --preset debug
+cmake --build --preset debug
+
+if Ninja isn't installed, drop the generator override:
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+
+(legacy) raw g++ invocation, kept for reference - CMake now replaces this
+g++ -std=c++17 -O3 -o main main.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+g++ -std=c++17 -O3 -o test tests/test.cpp src/core/neural_network.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
 
 
 
@@ -13,7 +34,7 @@ imgui
 
 tensors, broadcasting, optimizers
 
-CUDA or OpenCL for gpu
+CUDA or OpenCL for gpu multi-threading
 
 class Layer {
 public:
@@ -32,3 +53,8 @@ use tensor instead of matrix
 conv 2d layer
 
 batchnorm, softmaxCrossEntropy
+
+differential programming
+
+TODO: make test.cpp's main() return non-zero on any test failure, so CTest
+can rely on the exit code instead of a FAIL_REGULAR_EXPRESSION string match.

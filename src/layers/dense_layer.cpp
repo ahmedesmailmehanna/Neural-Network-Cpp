@@ -36,8 +36,9 @@ void DenseLayer::forward(Matrix &input) {
     
     // Apply activation function
     output = output.applyFunction([this](std::vector<double> x) { 
-return activation->activate(x); 
-}); 
+        return activation->activate(x);
+        }
+    ); 
 }
 
 // Backpropagation: Compute weight and bias updates
@@ -51,7 +52,7 @@ Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
         // For Softmax output layer, we assume d_output = predictions - target
         delta = d_output;  // No need to multiply by activation derivative
     } else {
-        // Compute derivative of activation
+        // compute derivative of activation
         Matrix d_activation = output.applyFunction([this](std::vector<double> x) { return activation->derivative(x); });
 
         // Compute delta for backpropagation
@@ -59,7 +60,7 @@ Matrix DenseLayer::backward(Matrix &d_output, double learning_rate) {
         delta = d_output.elementWiseMultiply(d_activation);
     }
 
-    // Compute gradients
+    // compute gradients
     Matrix d_weights = input.transpose() * delta; // Transpose input for correct multiplication
     // d_weights has shape (input_size, output_size)
     // d_weights = input^T * delta

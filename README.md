@@ -32,8 +32,10 @@ This framework provides the building blocks for creating and training neural net
 ## Getting Started
 
 ### Requirements
-- C++17 compiler (g++/clang++)
+- C++17 compiler (g++/clang++/MSVC)
+- CMake 3.15+
 - Standard library only (no external dependencies)
+- Optional: [Ninja](https://ninja-build.org/) (used by the default CMake preset; drop `-G Ninja` / use plain `cmake -B build` if you don't have it)
 
 ### Installation
 1. Clone the repository:
@@ -45,12 +47,36 @@ cd Neural-Network-Cpp
   - Add the src directory to your project's include path.
   - Include the necessary headers in your code.
 
-### Compilation
-```bash
-# Compile all source files directly
-g++ -std=c++17 -O3 -o main main.cpp src/math/matrix.cpp src/layers/dense_layer.cpp src/layers/conv_layer.cpp src/utils/mnist_loader.cpp src/utils/matrix_utils.cpp -I./
+### Compilation (CMake)
 
+This repo is a library (everything under `src/`) plus two thin executables that link against it: `main.cpp` (a usage example) and `tests/test.cpp` (the test suite). Building is done through CMake rather than hand-written compiler invocations:
+
+```bash
+# Configure + build (Release, -O3, via CMakePresets.json)
+cmake --preset default
+cmake --build --preset default
+
+# Run the example (accuracy test for model v3.1)
+./build/main
+
+# Run the tests
+./build/test
+# or via CTest:
+ctest --preset default
 ```
+
+If Ninja isn't installed, configure without a preset instead:
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+To build only the library (e.g. when consuming this repo from another CMake project), disable the example and tests:
+```bash
+cmake --preset default -DNNCPP_BUILD_EXAMPLE=OFF -DNNCPP_BUILD_TESTS=OFF
+```
+
+See `CMakeLists.txt` for the full set of options, and `notes.txt` for the equivalent commands plus the legacy raw `g++` invocation kept for reference.
 
 ## Framework Components
 
@@ -151,6 +177,10 @@ Neural-Network-Cpp/
 │   ├── utils/               # MNIST loader and utility functions
 ├── tests/                   # Unit tests for the framework
 ├── data/                    # MNIST dataset files
+├── CMakeLists.txt           # Build definition (library + example + tests)
+├── CMakePresets.json        # Ninja/Release and Debug presets
+├── main.cpp                 # Usage example (not part of the library itself)
+├── notes.txt                # Build commands + development notes
 ├── README.md                # Project documentation
 ```
 
